@@ -10,3 +10,6 @@ def deposito(saldo, valor) : #Aumenta o saldo da conta com o valor do depósito.
     saldo = saldo + valor;
     return saldo
 
+def saque(saldo, valor) : #Diminui o saldo da conta com o valor do saque.
+    saldo = saldo - valor;
+    return saldo

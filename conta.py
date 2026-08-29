@@ -13,3 +13,7 @@ def deposito(saldo, valor) : #Aumenta o saldo da conta com o valor do depósito.
 def saque(saldo, valor) : #Diminui o saldo da conta com o valor do saque.
     saldo = saldo - valor;
     return saldo
+
+def extrato(saldo) : #Mostra o saldo atual da conta.
+    return saldo
+

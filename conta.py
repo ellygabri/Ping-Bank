@@ -4,5 +4,9 @@ def n_conta_agencia(nc) : #Atribui o número da conta em sua criação junto à 
                   #agência, que, por questão de simplicidade, será sempre a mesma.
     nc = nc + 1;
     na = 2;
-    return (nc, na)
+    return (nc, na, 0) #Obs.: 0 -> Saldo inicial da conta.
+
+def deposito(saldo, valor) : #Aumenta o saldo da conta com o valor do depósito.
+    saldo = saldo + valor;
+    return saldo
 

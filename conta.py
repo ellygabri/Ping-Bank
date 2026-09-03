@@ -1,19 +1,24 @@
 #RESPONSABILIDADES: N CONTA, AGENCIA, DADOS SOBRE SALDO, EXTRATO, DEPÓSITO, SAQUE.
 
-def n_conta_agencia(nc) : #Atribui o número da conta em sua criação junto à uma
-                  #agência, que, por questão de simplicidade, será sempre a mesma.
-    nc = nc + 1;
-    na = 2;
-    return (nc, na, 0) #Obs.: 0 -> Saldo inicial da conta.
+def cria_conta_agencia() :      #Atribui o número da conta em sua criação junto à uma
+                                    #agência, que, por questão de simplicidade, será sempre a mesma.
+    num_conta = 1;
+    num_agencia = 2;
+    return (num_conta, num_agencia, 0) #Obs.: 0 -> Saldo inicial da conta.
 
-def deposito(saldo, valor) : #Aumenta o saldo da conta com o valor do depósito.
-    saldo = saldo + valor;
-    return saldo
+def deposito(saldo, dep) : #Aumenta o saldo da conta com o valor do depósito.
+    if dep > 0:
+        saldo = saldo + dep;
+        return saldo;
+    else:
+      return False;
 
-def saque(saldo, valor) : #Diminui o saldo da conta com o valor do saque.
-    saldo = saldo - valor;
-    return saldo
+def saque(saldo, saq) : #Diminui o saldo da conta com o valor do saque.
+     if saldo <= saq:
+      saldo = saldo - saq;
+      return saldo;
+     else:
+       return False;
 
-def extrato(saldo) : #Mostra o saldo atual da conta.
-    return saldo
+
 

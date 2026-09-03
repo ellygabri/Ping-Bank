@@ -2,23 +2,23 @@
 
 def cria_conta_agencia() :      #Atribui o número da conta em sua criação junto à uma
                                     #agência, que, por questão de simplicidade, será sempre a mesma.
-    num_conta = 1;
-    num_agencia = 2;
+    num_conta = 1
+    num_agencia = 2
     return (num_conta, num_agencia, 0) #Obs.: 0 -> Saldo inicial da conta.
 
-def deposito(saldo, dep) : #Aumenta o saldo da conta com o valor do depósito.
-    if dep > 0:
-        saldo = saldo + dep;
-        return saldo;
+def deposito(saldo, deposito) : #Aumenta o saldo da conta com o valor do depósito.
+    if deposito > 0:
+        saldo = saldo + deposito
+        return saldo
     else:
-      return False;
+      return False
 
-def saque(saldo, saq) : #Diminui o saldo da conta com o valor do saque.
-     if saldo <= saq:
-      saldo = saldo - saq;
-      return saldo;
+def saque(saldo, saque) : #Diminui o saldo da conta com o valor do saque.
+     if saldo <= saque:
+      saldo = saldo - saque
+      return saldo
      else:
-       return False;
+       return False
 
 
 

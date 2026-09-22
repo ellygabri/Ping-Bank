@@ -126,5 +126,19 @@ def consultar_saldo(): #Consulta o saldo da conta.
     print("Saldo atual: R$", contas[indice][4]) #Finalização.
     return 
 
+def listar_contas(): #Lista todas as contas cadastradas no banco de dados.
+    
+    if len(contas) == 0:
+        print("Não há contas cadastradas!")
+        return
+    
+    print("==== CONTAS CADASTRADAS ====")
 
+    for conta_apresentada in contas:
+        print("Número da conta: ", conta_apresentada[0])
+        print("Número da agência: ", conta_apresentada[1])
+        print("Tipo de conta: ", "Individual" if conta_apresentada[2] == 1 else "Conjunta")
+        print("Saldo: R$", conta_apresentada[3])
+        print("Titulares: ", ", ".join(conta_apresentada[4]))
+        print("==============================")
 

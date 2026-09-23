@@ -82,7 +82,7 @@ def deposito(): #Aumenta o saldo da conta com o valor do depósito.
         print("Valor inválido. Por favor, tente novamente.")
         valor_deposito = float(input("Digite o valor a ser depositado: "))
 
-    contas[indice] = contas[indice][:4] + (valor_deposito,) + contas[indice][5:]#Finalização.
+    contas[indice] = contas[indice][:3] + (contas[indice][3] + valor_deposito,) + contas[indice][4:] #Finalização. O valor de depósito é adicionado ao valor preexistente.
     print("Depósito realizado com sucesso.")
     return 
 
@@ -101,11 +101,11 @@ def saque(): #Diminui o saldo da conta com o valor do saque.
         return
 
     valor_saque = float(input("Digite o valor a ser sacado: "))
-    while valor_saque < 0 or valor_saque > contas[indice][4]: #Evitando valores inválidos.
+    while valor_saque < 0 or valor_saque > contas[indice][3]: #Evitando valores inválidos.
         print("Valor inválido. Por favor, tente novamente.")
         valor_saque = float(input("Digite o valor a ser sacado: "))
 
-    contas[indice] = contas[indice][:4] + (contas[indice][4] - valor_saque,) + contas[indice][5:] #Finalização.
+    contas[indice] = contas[indice][:3] + (contas[indice][3] - valor_saque,) + contas[indice][4:] #Finalização. O valor de saque é subtraído do valor preexistente.
     print("Saque realizado com sucesso.")
     return
 
@@ -123,18 +123,18 @@ def consultar_saldo(): #Consulta o saldo da conta.
         print("Transação não autorizada.")
         return
     
-    print("Saldo atual: R$", contas[indice][4]) #Finalização.
+    print("Saldo atual: R$", contas[indice][3]) #Finalização.
     return 
 
 def listar_contas(): #Lista todas as contas cadastradas no banco de dados.
     
-    if len(contas) == 0:
+    if len(contas) == 0: #Tratamento de lista vazia.
         print("Não há contas cadastradas!")
         return
     
     print("==== CONTAS CADASTRADAS ====")
 
-    for conta_apresentada in contas:
+    for conta_apresentada in contas: #Contas apresentadas conforme a lista é percorrida.
         print("Número da conta: ", conta_apresentada[0])
         print("Número da agência: ", conta_apresentada[1])
         print("Tipo de conta: ", "Individual" if conta_apresentada[2] == 1 else "Conjunta")
@@ -142,3 +142,126 @@ def listar_contas(): #Lista todas as contas cadastradas no banco de dados.
         print("Titulares: ", ", ".join(conta_apresentada[4]))
         print("==============================")
 
+def alterar_dados_conta(): #Altera os dados passíveis de alteração da conta.
+
+    num_conta = input("Digite o número da conta: ")
+    num_agencia = input("Digite o número da agência: ")
+    verificar_existencia, indice = verificador_existencia(num_conta, num_agencia) #Verifica a existência da conta e da agência no banco de dados.
+    if verificar_existencia != 1:
+        print("Os dados não correspondem. Por favor, tente novamente.")
+        return
+    
+    cpf_validacao = input("Por favor, digite o CPF do titular da conta: ") #Checagem de segurança (espécie de senha).
+    if (verificacao_seguranca(cpf_validacao)) != 1:
+        print("Transação não autorizada.")
+        return
+
+    print("==== ALTERAR DADOS DA CONTA ====") #Menu de opções para alteração.
+    print("1 - Alterar tipo de conta")
+    print("2 - Alterar titulares da conta")
+    opcao_alteracao = int(input("Escolha a opção desejada: "))
+    
+    if opcao_alteracao == 1: #Opção para alterar o tipo de conta.
+        novo_tipo_conta = int(input("Informe o novo tipo de conta (1 - Individual, 2 - Conjunta): "))
+
+        if novo_tipo_conta == 1: #...Caso individual
+            novo_titular_unico = input("Informe o CPF titular unitário da conta: ")
+            contas[indice] = contas[indice][:4] + (novo_titular_unico,) #Basta apenas vincular ao final da lista menos o último elemento (os titulares antigos)
+            print("Tipo de conta alterado com sucesso: Individual, CPF: ", contas[indice][4])
+            return
+
+        elif novo_tipo_conta == 2: #... Caso conjunta
+            qtd_novos_titulares = int(input("Informe a quantidade de titulares da conta: "))
+            while qtd_novos_titulares < 2: #Verificação para garantir a quantidade referente ao tipo.
+                print("Para uma conta conjunta, é necessário ter pelo menos dois titulares. Por favor, tente novamente.")
+                qtd_novos_titulares = int(input("Informe a quantidade de titulares da conta: "))
+
+            tentativas = 0 
+            titulares = ()
+            while tentativas < qtd_novos_titulares: #Loop de cadastro dos titulares, tolerante à erros de digitação.
+                cpf = input("Informe o CPF do novo titular da conta: ")
+                if cpf in cpf_clientes: #Checagem da existência do cliente no banco de dados.
+                    titulares = titulares + (cpf,)
+                    tentativas += 1
+                else:
+                    print("Cliente não encontrado. Por favor, tente novamente.")
+
+            # Finalização. A lista original é fatiada nos valores aos quais interessa a modificação. 
+            # Entre as partes fatiadas, os novos valores são inseridos.
+            contas[indice] = contas[indice][:2] + (novo_tipo_conta,) + contas[indice][3] + (contas[indice][:4] + (titulares,)) 
+            print("Tipo de conta alterado com sucesso: ", contas[indice][2], ", CPF´s: ", ", ".join(contas[indice][4]))
+        else:
+            print("Opção inválida. Por favor, tente novamente.")
+            return
+    
+    elif opcao_alteracao == 2: #Opção para alterar os titulares da conta.
+        print("=== ATUAIS TITULARES === ") #Os atuais titulares são apresentados.
+        print("Titulares: ", ", ".join(contas[indice][4]))
+        print("==========================") #... E as novas opções de alteração são apresentadas.
+        print("1 - Adicionar titular")
+        print("2 - Remover titular")
+        print("3 - Substituir titular")
+        print("Digite outros números para retornar ao menu principal.")
+        opcao_titular = int(input("Escolha a opção desejada: ")) 
+
+        if opcao_titular == 1: #Adição de titular.
+            titulares = () #Lista de apoio.
+            while titulares != 0: #Loop de cadastro dos titulares, tolerante à erros de digitação.
+
+                novo_titular = input("Informe o CPF do titular a ser adicionado (0 para finalizar): ")
+                for procurar_titular in cpf_clientes: #Checagem da existência do cliente no banco de dados.
+                    if novo_titular in cpf_clientes:
+                        titular_adicionado = contas[procurar_titular][4] #Resgate da tupla de titulares.
+                        indice_a_adicionar = 0 #Índice de interesse.
+                        for cpf_adicionado in titular_adicionado: #Buscamos o CPF em questão na tupla e adicionamos um valor ao índice caso não o encontremos,
+                            if cpf_adicionado != novo_titular:    # representando que o índice de interese não é o que foi checado no momento.
+                                indice_a_adicionar += 1
+                            else:
+                                break
+                        #Alteramos a tupla que resgatamos, de modo a adicionar o novo titular.
+                        titular_adicionado = titular_adicionado[:indice_a_adicionar] + (novo_titular,) + titular_adicionado[indice_a_adicionar + 1:]
+                        contas[procurar_titular] = contas[procurar_titular][:4] + (titular_adicionado,) #Finalização. A tupla de titulares alterada é adicionada às informações do cliente na lista.
+                        print("Titular adicionado com sucesso: ", ", ".join(contas[procurar_titular][4]))
+                        return
+                    else:
+                        print("Cliente não encontrado. Por favor, tente novamente.")
+            
+        elif opcao_titular == 2: #Remoção de titular.
+
+            titular_a_remover = input("Informe o CPF do titular a ser removido: ")
+            for procurar_titular in cpf_clientes: #Checagem da existência do cliente no banco de dados.
+                if titular_a_remover in contas[procurar_titular][4]:
+                    titular_subtraido = contas[procurar_titular][4] #Resgate da tupla de titulares.
+                    indice_a_subtrair = 0 #Índice de interesse.
+                    for cpf_subtraido in titular_subtraido: #Buscamos o CPF em questão na tupla e adicionamos um valor ao índice caso não o encontremos,
+                        if cpf_subtraido != titular_a_remover: # representando que o índice de interesse não é o que foi checado no momento.
+                            indice_a_subtrair += 1
+                        else:
+                            break
+                    #Alteramos a tupla que resgatamos, de modo a remover o titular. (Note que não consideramos o índice encontrado no momento de unir a tupla, indicando uma exclusão)
+                    titular_subtraido = titular_subtraido[:indice_a_subtrair] + titular_subtraido[indice_a_subtrair + 1:]
+                    contas[procurar_titular] = contas[procurar_titular][:4] + (titular_subtraido,) #Finalização. A tupla de titulares alterada é adicionada às informações do cliente na lista.
+                    print("Titular removido com sucesso: ", contas[procurar_titular][4])
+                    return
+                else:
+                   print("Cliente não encontrado. Por favor, tente novamente.")
+        elif opcao_alteracao == 3: 
+
+            titular_a_alterar = input("Informe o CPF do titular a ser alterado: ")
+            for procurar_titular in cpf_clientes: #Checagem da existência do cliente no banco de dados.
+                if titular_a_alterar in contas[procurar_titular][4]: 
+                    titular_alterado = contas[procurar_titular][4] #Resgate da tupla de titulares.
+                    indice_a_alterar = 0 #Índice de interesse.
+                    for cpf_alterado in titular_alterado: #Buscamos o CPF em questão na tupla e adicionamos um valor ao índice caso não o encontremos,
+                        if cpf_alterado != titular_a_alterar: # representando que o índice de interesse não é o que foi checado no momento.
+                            indice_a_alterar += 1
+                        else:
+                            break
+                    novo_titular = input("Informe o CPF do novo titular: ") #(!ALERTA!: Necessário adicionar uma checagem de existência. Postergada em razão da possibilidade de alteração na lógica atual da checagem)
+                    #Alteramos a tupla que resgatamos, de modo a substituir o titular. O índice encontrado é o ponto do corte, o novo tituar é inserido no meio da tupla, de modo a substituir o valor antigo.
+                    titular_alterado = titular_alterado[:indice_a_alterar] + (novo_titular,) + titular_alterado[indice_a_alterar + 1:]
+                    contas[procurar_titular] = contas[procurar_titular][:4] + (titular_alterado,) #Finalização. A tupla de titulares alterada é adicionada às informações do cliente na lista.
+                    print("Titular alterado com sucesso: ", contas[procurar_titular][4])
+                    return
+        else:
+            return

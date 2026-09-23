@@ -1,31 +1,43 @@
+# Função de apoio, não precisa aparecer como opção no menu. Está sendo utilizada para evitar repetir a lógica de busca em todas as partes em que seriam necessárias.
+
 def buscar_agencia(agencias, num_agencia):
-    for agencia in agencias:
-        if agencia[0] == num_agencia:
-            return agencia
-    return None
-
-def cadastrar_agencia(agencias):
-    num_agencia = input("informe o numero da agência: ")
-
-    if buscar_agencia(agencias, num_agencia) != None:
-        print("Agência já cadastrada!")
-        return
+    for i in range(len(agencias)):
+        if agencias[i][0] == num_agencia:
+            return i
+    return -1
     
-    nome_agencia = input("Informe o nome da agência: ")
+#Cadastrar Agência:  
+  
+def cadastrar_agencia(agencias, num_agencia, nome_agencia):
+    if num_agencia.strip() == "" or nome_agencia.strip() == "":
+        return False
+    indice = buscar_agencia(agencias, num_agencia)
+    if indice != -1:
+        print("Agência já cadastrada!")
+        return False
+    agencia = (num_agencia, nome_agencia)
+    return agencia
+    
+#Função para procurar apenas uma agência:    
+    
+def procurar_agencia (agencias, num_agencia):
+    indice = buscar_agencia(agencias, num_agencia)
+    if indice == -1:
+        print("Agência não localizada!")
+        return False
+    agencia = agencias[indice]
+    print("Número: ", agencia[0], "Nome: ", agencia[1])
+    return True
 
-    agencia = [num_agencia, nome_agencia]
-    agencias.append(agencia)
-
-    print("Agência cadastrada com sucesso!")
+#Listar todas as agências
 
 def listar_agencias(agencias):
     if len(agencias) == 0:
         print("Nenhuma agência cadastrada!")
         return
     
-    print("==== AGÊNCIAS ====")
+    print("========== AGÊNCIAS ==========")
 
     for agencia in agencias:
-        print("Número: ", agencia[0])
-        print("Nome: ", agencia[1])
-        print("============================")
+        print("Número: ", agencia[0], "Nome: ", agencia[1])
+    print("============================")

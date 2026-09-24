@@ -153,12 +153,13 @@ def alterar_dados_conta(): #Altera os dados passíveis de alteração da conta.
     
     cpf_validacao = input("Por favor, digite o CPF do titular da conta: ") #Checagem de segurança (espécie de senha).
     if (verificacao_seguranca(cpf_validacao)) != 1:
-        print("Transação não autorizada.")
+        print("Ação não autorizada.")
         return
 
     print("==== ALTERAR DADOS DA CONTA ====") #Menu de opções para alteração.
     print("1 - Alterar tipo de conta")
     print("2 - Alterar titulares da conta")
+    print("Digite outros números para retornar ao menu principal.")
     opcao_alteracao = int(input("Escolha a opção desejada: "))
     
     if opcao_alteracao == 1: #Opção para alterar o tipo de conta.
@@ -201,6 +202,7 @@ def alterar_dados_conta(): #Altera os dados passíveis de alteração da conta.
         print("1 - Adicionar titular")
         print("2 - Remover titular")
         print("3 - Substituir titular")
+        print("4 - Excluir conta")
         print("Digite outros números para retornar ao menu principal.")
         opcao_titular = int(input("Escolha a opção desejada: ")) 
 
@@ -248,6 +250,8 @@ def alterar_dados_conta(): #Altera os dados passíveis de alteração da conta.
         elif opcao_alteracao == 3: 
 
             titular_a_alterar = input("Informe o CPF do titular a ser alterado: ")
+
+
             for procurar_titular in cpf_clientes: #Checagem da existência do cliente no banco de dados.
                 if titular_a_alterar in contas[procurar_titular][4]: 
                     titular_alterado = contas[procurar_titular][4] #Resgate da tupla de titulares.
@@ -263,5 +267,33 @@ def alterar_dados_conta(): #Altera os dados passíveis de alteração da conta.
                     contas[procurar_titular] = contas[procurar_titular][:4] + (titular_alterado,) #Finalização. A tupla de titulares alterada é adicionada às informações do cliente na lista.
                     print("Titular alterado com sucesso: ", contas[procurar_titular][4])
                     return
+        elif opcao_alteracao == 4: #Exclusão da conta.
+
+            conta_a_excluir = input("Informe o número da conta a ser deletada: ")
+            agencia_da_conta = input("Informe o número da agência da conta a ser deletada: ")
+
+            verificar_existencia, indice = verificador_existencia(conta_a_excluir, agencia_da_conta) #Verifica a existência da conta e da agência no banco de dados.
+            if verificar_existencia != 1:
+                print("Os dados não correspondem. Por favor, tente novamente.")
+                return
+            
+            if len(contas[indice][4]) > 2 or contas[indice][3] > 0: #Verificação de saldo e quantidade de titulares, a fim de evitar exclusão indevida.
+                print("Não é possível excluir a conta. A conta possui saldo e/ou mais de um titular. Por favor, revise os dados e tente novamente.")
+                return
+            else:
+                print("A conta será excluída. Tem certeza? Digite 'Sim' ou 'Não' para confirmar.")
+                while True: #Loop de confirmação, tolerante à erros de digitação.
+                    confirmacao = input("Confirmação: ")
+                    if confirmacao.strip().lower() == 'não': 
+                        print("Exclusão cancelada.")
+                        return
+                    elif confirmacao.strip().lower() == 'sim': 
+                        print("Excluindo a conta...")
+                        #Removemos a tupla do índice indicado pela checagem de existência.
+                        contas.pop(indice) #Finalização. A tupla da conta é excluída.
+                        print("Conta excluída com sucesso.")
+                        return
+                    else:
+                        print("Opção inválida. Por favor, tente novamente.")
         else:
             return

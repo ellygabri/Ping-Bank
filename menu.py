@@ -104,8 +104,11 @@ def cadastrar_agencia_fluxo(lista_agencias):
     numero = input("Número da agência: ").strip()
     nome = input("Nome/localização: ").strip()
     nova_agencia = agencia.cadastrar_agencia(lista_agencias, numero, nome)
-    if nova_agencia is False:
-        print("Não foi possível cadastrar a agência.")
+    if nova_agencia == 0:
+        print("Erro: todos os campos são obrigatórios.")
+        return
+    if nova_agencia == 1:
+        print("Erro: essa agência já está cadastrada.")
         return
     lista_agencias.append(nova_agencia)
     print("Agência cadastrada com sucesso.")

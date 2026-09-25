@@ -6,38 +6,29 @@ def buscar_agencia(agencias, num_agencia):
             return i
     return -1
     
-#Cadastrar Agência:  
+#Cadastrar uma agência  
   
 def cadastrar_agencia(agencias, num_agencia, nome_agencia):
     if num_agencia.strip() == "" or nome_agencia.strip() == "":
-        return False
+        return 0
     indice = buscar_agencia(agencias, num_agencia)
     if indice != -1:
-        print("Agência já cadastrada!")
-        return False
+        return 1
     agencia = (num_agencia, nome_agencia)
     return agencia
     
-#Função para procurar apenas uma agência:    
+#Função para procurar apenas uma agência cadastrada 
     
 def procurar_agencia (agencias, num_agencia):
     indice = buscar_agencia(agencias, num_agencia)
     if indice == -1:
-        print("Agência não localizada!")
         return False
     agencia = agencias[indice]
-    print("Número: ", agencia[0], "Nome: ", agencia[1])
-    return True
+    return agencia
 
-#Listar todas as agências
+#Listar todas as agências do banco
 
 def listar_agencias(agencias):
     if len(agencias) == 0:
-        print("Nenhuma agência cadastrada!")
-        return
-    
-    print("========== AGÊNCIAS ==========")
-
-    for agencia in agencias:
-        print("Número: ", agencia[0], "Nome: ", agencia[1])
-    print("============================")
+        return False
+    return agencias

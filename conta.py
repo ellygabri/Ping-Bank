@@ -157,7 +157,7 @@ def adicionar_titular(contas, clientes, num_conta, num_agencia, cpf_validacao, n
     for titular in titulares:
         if titular == novo_titular:
             return 0
-    novos_titulares = (titulares + (novo_titular))
+    novos_titulares = titulares + (novo_titular,)
 
     contas[indice] = (conta[0], conta[1], 2, conta[3], novos_titulares)
     return 1

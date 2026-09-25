@@ -6,14 +6,14 @@ def buscar_cliente(clientes, cpf):
             return i
     return -1
 
-#Cadastrar um cliente
+#Cadastrar um cliente no sistema do banco
 
 def cadastrar_cliente(nome, cpf, contato, endereco, data_nascimento, email):
     if nome.strip() == "" or cpf.strip() == "" or contato.strip() == "" or endereco.strip() == "" or data_nascimento.strip() == "" or email.strip() == "":
         return False
     return (nome, cpf, contato, endereco, data_nascimento, email)
 
-#Procurar um cliente
+#Procurar um cliente cadastrado
 
 def procurar_cliente(clientes, cpf):
     indice = buscar_cliente(clientes, cpf)
@@ -53,4 +53,18 @@ def editar_cliente(clientes, nome, cpf, contato, endereco, data_nascimento, emai
     print("Cliente editado com sucesso!")
     return True
 
-#Falta a função Excluir_conta.
+#Excluir clientes | Um cliente não deve ser excluido se ainda for titular de uma conta
+
+def excluir_cliente(clientes, contas, cpf):
+    indice = buscar_cliente(clientes, cpf)
+    if indice == -1:
+        return -1
+    
+    for conta in contas:
+        titulares = conta[4]
+        for titular in titulares:
+            if titular == cpf:
+                return 0
+            
+    del clientes[indice]
+    return 1

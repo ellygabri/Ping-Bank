@@ -1,0 +1,38 @@
+{
+    "clientes": [
+        {
+            "nome": "a",
+            "cpf": "07187403518",
+            "contato": "444",
+            "endereco": "aa",
+            "data_nascimento": "44",
+            "email": "aaa"
+        }
+    ],
+    "agencias": [
+        {
+            "numero": "01",
+            "nome": "eds"
+        }
+    ],
+    "contas": [
+        {
+            "numero": 1,
+            "agencia": "01",
+            "tipo": 1,
+            "saldo": 88.0,
+            "titulares": [
+                "07187403518"
+            ]
+        },
+        {
+            "numero": 2,
+            "agencia": "01",
+            "tipo": 1,
+            "saldo": 1002.0,
+            "titulares": [
+                "07187403518"
+            ]
+        }
+    ]
+}

@@ -1,6 +1,3 @@
-from cliente import buscar_cliente
-from agencia import buscar_agencia
-
 def verificador_existencia(contas, num_conta, num_agencia): #Verifica a existência da conta e da agência no banco de dados.
     indice = 0
     for conta in contas: 
@@ -29,9 +26,9 @@ def gerar_numero_conta(contas, num_agencia):
                 maior_numero = int(conta["num_conta"])
     return maior_numero + 1
 
-def criar_conta(contas, clientes, agencias, num_agencia, tipo_titulares, saldo, titulares, tipo_conta): #Criação da conta e adição dos dados relacionados.   
-    indice_agencia = buscar_agencia(agencias, num_agencia)
-    if indice_agencia == -1:
+def criar_conta(contas, clientes, agencias, num_agencia, tipo_titulares, saldo, titulares, tipo_conta): #Criação da conta e adição dos dados relacionados. 
+
+    if num_agencia not in agencias:
         return -1
     if tipo_titulares != 1 and tipo_titulares != 2:
         return -2
@@ -42,8 +39,9 @@ def criar_conta(contas, clientes, agencias, num_agencia, tipo_titulares, saldo, 
     elif tipo_titulares == 2 and len(titulares) < 2:
         return -4
 
+
     for cpf in titulares:
-        if buscar_cliente(clientes, cpf) == -1:
+        if cpf not in clientes:
             return -5
  
     num_conta = gerar_numero_conta(contas, num_agencia)
@@ -157,7 +155,7 @@ def adicionar_titular(contas, clientes, num_conta, num_agencia, cpf_validacao, n
     if contas[indice]["tipo_titulares"] == 1:
         return -4
     for cpf_novo in novo_titular:
-        if buscar_cliente(clientes, cpf_novo) == -1:
+        if cpf_novo not in clientes:
             return -3
     
     for cpf_novo in novo_titular:
@@ -180,7 +178,7 @@ def substituir_titular(contas, clientes, num_conta, num_agencia, cpf_validacao, 
     if contas[indice]["tipo_titulares"] == 1 and len(novo_titular) != 1:
         return -4
     for cpf_novo in novo_titular:
-        if buscar_cliente(clientes, cpf_novo) == -1:
+        if cpf_novo not in clientes:
             return -3
         if cpf_novo in contas[indice]["titulares"]:
             return -4

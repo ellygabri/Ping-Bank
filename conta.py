@@ -3,31 +3,28 @@ from agencia import buscar_agencia
 
 def verificador_existencia(contas, num_conta, num_agencia): #Verifica a existência da conta e da agência no banco de dados.
 
-    for i in range(len(contas)): #Navega por toda a lista a fim de constatar a existência dos dados.
-        if contas[i][0] == num_conta and contas[i][1] == num_agencia: #É de extrema importância alinhar os índices para garantir exatidão na checagem.
-            return i
+    if num_conta in contas and contas[num_conta]["num_agencia"] == num_agencia: #É de extrema importância alinhar os índices para garantir exatidão na checagem.
+            return num_conta
     return -1
 
 def verificacao_seguranca(contas, indice, cpf): #Checagem de segurança (uma espécie de senha).
-    titulares = contas[indice][4]
+    titulares = contas[indice]["titulares"]
 
-    for titular in titulares: 
-        if titular == cpf:
-            return 1
+    if cpf in titulares:
+        return 1
     return 0
 
 def gerar_numero_conta(contas, num_agencia):
 
     maior_numero = 0
 
-    for conta in contas:
+    for num_conta, conta in contas.items():
 
-        if conta[1] == num_agencia:
+        if conta["num_agencia"] == num_agencia:
 
-            if conta[0] > maior_numero:
+            if num_conta > maior_numero:
 
-                maior_numero = conta[0]
-
+                maior_numero = num_conta
     return maior_numero + 1
 
 def criar_conta(contas, clientes, agencias, num_agencia, tipo_conta, saldo, titulares): #Criação da conta e adição dos dados relacionados.   
@@ -40,22 +37,30 @@ def criar_conta(contas, clientes, agencias, num_agencia, tipo_conta, saldo, titu
         return -3
     if tipo_conta == 1 and len(titulares) != 1:
         return -4
-    for i in range(len(titulares)):
-        cpf = titulares[i]
+    elif tipo_conta == 2 and len(titulares) < 2:
+        return -4
+
+    for cpf in titulares:
         if buscar_cliente(clientes, cpf) == -1:
             return -5
-        for j in range(i+1, len(titulares)):
-            if titulares[i] == titulares[j]:
-                return -6
+ 
     num_conta = gerar_numero_conta(contas, num_agencia)
-    conta = (num_conta, num_agencia, tipo_conta, saldo, titulares)
+    conta = {
+        "num_agencia" : num_agencia,
+        "tipo_conta" : tipo_conta,
+        "saldo" : saldo,
+        "titulares" : titulares
+    }
 
-    return conta
+    return conta, num_conta #Como a chamada da função gira em torno de ter "conta" diretamente e a adição é feita lá mesmo, tornou-se necessário
+                            # passar também o "num_conta" para permitir a alteração na main: de "lista_contas.append(nova_conta)" para "contas[num_conta] = contas"
 
-def procurar_conta(contas, num_conta, num_agencia):
+def procurar_conta(contas, num_conta, num_agencia, cpf):
     indice = verificador_existencia(contas, num_conta, num_agencia)
     if indice == -1:
         return False
+    if verificacao_seguranca(contas, indice, cpf) != 1:
+        return -2
     return contas[indice]
 
 def listar_contas(contas):
@@ -71,10 +76,7 @@ def deposito(contas, num_conta, num_agencia, cpf, valor_deposito): #Aumenta o sa
         return -2
     if valor_deposito <= 0:
         return 0
-    conta = contas[indice]
-    novo_saldo = (conta[3] + valor_deposito)
-
-    contas[indice] = (conta[0], conta[1], conta[2], novo_saldo, conta[4])
+    contas[indice]["saldo"] += valor_deposito
     return 1
 
 def saque(contas, num_conta, num_agencia, cpf, valor_saque): #Diminui o saldo da conta com o valor do saque.
@@ -86,13 +88,9 @@ def saque(contas, num_conta, num_agencia, cpf, valor_saque): #Diminui o saldo da
         return -2
     if valor_saque <= 0:
         return 0
-    conta = contas[indice]
-
-    if valor_saque > conta[3]:
+    if valor_saque > contas[indice]["saldo"]:
         return -3
-    novo_saldo = (conta[3] - valor_saque)
-
-    contas[indice] = (conta[0], conta[1], conta[2], novo_saldo, conta[4])
+    contas[indice]["saldo"] -= valor_saque
     return 1
 
 def consultar_saldo(contas, num_conta, num_agencia, cpf): #Consulta o saldo da conta.
@@ -102,9 +100,9 @@ def consultar_saldo(contas, num_conta, num_agencia, cpf): #Consulta o saldo da c
         return -1
     if verificacao_seguranca(contas, indice, cpf) != 1:
         return -2
-    return contas[indice][3]
+    return contas[indice]["saldo"]
 
-def tranferencia(contas, conta_origem, agencia_origem, cpf, conta_destino, agencia_destino, valor): #Função para realizar a operação de transferência entre contas
+def transferencia(contas, conta_origem, agencia_origem, cpf, conta_destino, agencia_destino, valor): #Função para realizar a operação de transferência entre contas
     indice_origem = verificador_existencia(contas, conta_origem, agencia_origem)
     if indice_origem == -1:
         return -1
@@ -118,23 +116,22 @@ def tranferencia(contas, conta_origem, agencia_origem, cpf, conta_destino, agenc
     if valor <= 0:
         return 0
     origem = contas[indice_origem]
-    destino = contas[indice_destino]
 
-    if valor > origem[3]:
+
+    if valor > origem["saldo"]:
         return -5
-    contas[indice_origem] = (origem[0], origem[1], origem[2], origem[3] - valor, origem[4])
-    contas[indice_destino] = (destino[0], destino[1], destino[2], destino[3]+valor, destino[4])
+    contas[indice_origem]["saldo"] -= valor
+    contas[indice_destino]["saldo"] += valor
     return 1
 
 def listar_contas_clientes(contas, cpf): #Listar todas as contas associadas ao cliente
-    contas_cliente = []
 
-    for conta in contas:
-        titulares = conta[4]
-        for titular in titulares:
-            if titular == cpf:
-                contas_cliente.append(conta)
-    if len(contas_cliente) == 0:
+    contas_cliente = 0
+    for conta in contas.values():
+        if cpf in conta["titulares"]:
+            contas_cliente += 1
+
+    if contas_cliente == 0:
         return False
     return contas_cliente
 
@@ -142,24 +139,27 @@ def listar_titulares(contas, num_conta, num_agencia): #Listar todos os clientes 
     indice = verificador_existencia(contas, num_conta, num_agencia)
     if indice == -1:
         return False
-    return contas[indice][4]
+    return contas[indice]["titulares"]
+
 def adicionar_titular(contas, clientes, num_conta, num_agencia, cpf_validacao, novo_titular): #Função para adicionar um cliente a uma conta
     indice = verificador_existencia(contas, num_conta, num_agencia)
     if indice == -1:
         return -1
     if verificacao_seguranca(contas, indice, cpf_validacao) != 1:
         return -2
-    if buscar_cliente(clientes, novo_titular) == -1:
-        return -3
-    conta = contas[indice]
-    titulares = conta[4]
-
-    for titular in titulares:
-        if titular == novo_titular:
+    if contas[indice]["tipo_conta"] == 1:
+        return -4
+    for cpf_novo in novo_titular:
+        if buscar_cliente(clientes, cpf_novo) == -1:
+            return -3
+    
+    titulares = contas[indice]["titulares"]
+    for cpf_novo in novo_titular:
+        if cpf_novo in titulares:
             return 0
-    novos_titulares = titulares + (novo_titular,)
+    
+    contas[indice]["titulares"].update(novo_titular)
 
-    contas[indice] = (conta[0], conta[1], 2, conta[3], novos_titulares)
     return 1
 
 def substituir_titular(contas, clientes, num_conta, num_agencia, cpf_validacao, titular_antigo, novo_titular): #Utilizado Para substituir um titular na conta
@@ -171,31 +171,20 @@ def substituir_titular(contas, clientes, num_conta, num_agencia, cpf_validacao, 
 
     if verificacao_seguranca(contas,indice,cpf_validacao) != 1:
         return -2
-
-    if buscar_cliente(clientes,novo_titular) == -1:
-        return -3
-
-    conta = contas[indice]
-    titulares = conta[4]
-
-    for titular in titulares:
-        if titular == novo_titular:
+    if contas[indice]["tipo_conta"] == 1 and len(novo_titular) != 1:
+        return -4
+    titulares = contas[indice]["titulares"]
+    for cpf_novo in novo_titular:
+        if buscar_cliente(clientes, cpf_novo) == -1:
+            return -3
+        if cpf_novo in titulares:
             return -4
-    encontrado = False
-    novos_titulares = ()
-
-    for titular in titulares:
-        if titular == titular_antigo:
-            novos_titulares = (novos_titulares + (novo_titular,))
-            encontrado = True
-
-        else:
-            novos_titulares = (novos_titulares + (titular,))
-
-    if encontrado == False:
-        return 0
-
-    contas[indice] = (conta[0],conta[1],conta[2],conta[3],novos_titulares)
+    
+    if titular_antigo in titulares:
+        del titulares[titular_antigo]
+        titulares.update(novo_titular)
+    else:
+            return 0
     return 1
 
 def excluir_conta(contas,num_conta,num_agencia,cpf): #Função utilizada para excluir uma conta cadastrada
@@ -207,10 +196,9 @@ def excluir_conta(contas,num_conta,num_agencia,cpf): #Função utilizada para ex
     if verificacao_seguranca(contas,indice,cpf) != 1:
         return -2
 
-    conta = contas[indice]
-
-    if conta[3] != 0:
+    if contas[indice]["saldo"] != 0:
         return 0
 
     del contas[indice]
     return 1
+

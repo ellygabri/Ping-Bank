@@ -2,9 +2,11 @@ from cliente import buscar_cliente
 from agencia import buscar_agencia
 
 def verificador_existencia(contas, num_conta, num_agencia): #Verifica a existência da conta e da agência no banco de dados.
-
-    if num_conta in contas and contas[num_conta]["num_agencia"] == num_agencia: #É de extrema importância alinhar os índices para garantir exatidão na checagem.
-            return num_conta
+    indice = 0
+    for conta in contas: 
+        if conta["num_conta"] == num_conta and conta["num_agencia"] == num_agencia: #É de extrema importância alinhar os índices para garantir exatidão na checagem.
+            return indice
+        indice += 1
     return -1
 
 def verificacao_seguranca(contas, indice, cpf): #Checagem de segurança (uma espécie de senha).
@@ -18,13 +20,13 @@ def gerar_numero_conta(contas, num_agencia):
 
     maior_numero = 0
 
-    for num_conta, conta in contas.items():
+    for conta in contas:
 
         if conta["num_agencia"] == num_agencia:
 
-            if num_conta > maior_numero:
+            if int(conta["num_conta"]) > maior_numero:
 
-                maior_numero = num_conta
+                maior_numero = int(conta["num_conta"])
     return maior_numero + 1
 
 def criar_conta(contas, clientes, agencias, num_agencia, tipo_titulares, saldo, titulares, tipo_conta): #Criação da conta e adição dos dados relacionados.   
@@ -46,6 +48,7 @@ def criar_conta(contas, clientes, agencias, num_agencia, tipo_titulares, saldo, 
  
     num_conta = gerar_numero_conta(contas, num_agencia)
     conta = {
+        "num_conta" : num_conta,
         "num_agencia" : num_agencia,
         "tipo_titulares" : tipo_titulares,
         "saldo" : saldo,
@@ -53,7 +56,7 @@ def criar_conta(contas, clientes, agencias, num_agencia, tipo_titulares, saldo, 
         "tipo_conta" : tipo_conta
     }
 
-    return conta, num_conta #Como a chamada da função gira em torno de ter "conta" diretamente e a adição é feita lá mesmo, tornou-se necessário
+    return conta #Como a chamada da função gira em torno de ter "conta" diretamente e a adição é feita lá mesmo, tornou-se necessário
                             # passar também o "num_conta" para permitir a alteração na main: de "lista_contas.append(nova_conta)" para "contas[num_conta] = contas"
 
 def procurar_conta(contas, num_conta, num_agencia, cpf):
@@ -77,7 +80,7 @@ def deposito(contas, num_conta, num_agencia, cpf, valor_deposito): #Aumenta o sa
         return -2
     if valor_deposito <= 0:
         return 0
-    if contas[indice]["tipo_conta"] == "salario":
+    if contas[indice]["tipo_conta"] == 3:
         return -2
     contas[indice]["saldo"] += valor_deposito
     return 1
@@ -110,7 +113,7 @@ def transferencia(contas, conta_origem, agencia_origem, cpf, conta_destino, agen
     if indice_origem == -1:
         return -1
     if verificacao_seguranca(contas, indice_origem, cpf) != 1:
-        return -5
+        return -2
     indice_destino = verificador_existencia(contas, conta_destino, agencia_destino)
     if indice_destino == -1:
         return -3
@@ -118,13 +121,11 @@ def transferencia(contas, conta_origem, agencia_origem, cpf, conta_destino, agen
         return -4
     if valor <= 0:
         return 0
-    if contas[indice_origem]["tipo_conta"] == "salario":
-        if cpf not in contas[indice_destino]["titulares"]:
-            return -2
-    origem = contas[indice_origem]
+    if contas[indice_origem]["tipo_conta"] == 3:
+        return -2 
 
 
-    if valor > origem["saldo"]:
+    if valor > contas[indice_origem]["saldo"]:
         return -5
     contas[indice_origem]["saldo"] -= valor
     contas[indice_destino]["saldo"] += valor
@@ -133,7 +134,7 @@ def transferencia(contas, conta_origem, agencia_origem, cpf, conta_destino, agen
 def listar_contas_clientes(contas, cpf): #Listar todas as contas associadas ao cliente
 
     contas_cliente = 0
-    for conta in contas.values():
+    for conta in contas:
         if cpf in conta["titulares"]:
             contas_cliente += 1
 
@@ -159,9 +160,8 @@ def adicionar_titular(contas, clientes, num_conta, num_agencia, cpf_validacao, n
         if buscar_cliente(clientes, cpf_novo) == -1:
             return -3
     
-    titulares = contas[indice]["titulares"]
     for cpf_novo in novo_titular:
-        if cpf_novo in titulares:
+        if cpf_novo in contas[indice]["titulares"]:
             return 0
     
     contas[indice]["titulares"].update(novo_titular)
@@ -179,16 +179,15 @@ def substituir_titular(contas, clientes, num_conta, num_agencia, cpf_validacao, 
         return -2
     if contas[indice]["tipo_titulares"] == 1 and len(novo_titular) != 1:
         return -4
-    titulares = contas[indice]["titulares"]
     for cpf_novo in novo_titular:
         if buscar_cliente(clientes, cpf_novo) == -1:
             return -3
-        if cpf_novo in titulares:
+        if cpf_novo in contas[indice]["titulares"]:
             return -4
     
-    if titular_antigo in titulares:
-        del titulares[titular_antigo]
-        titulares.update(novo_titular)
+    if titular_antigo in contas[indice]["titulares"] and len(novo_titular) >= 1:
+        del contas[indice]["titulares"][titular_antigo]
+        contas[indice]["titulares"].update(novo_titular)
     else:
             return 0
     return 1
@@ -208,3 +207,20 @@ def excluir_conta(contas,num_conta,num_agencia,cpf): #Função utilizada para ex
     del contas[indice]
     return 1
 
+def calculo_poupanca(num_conta, num_agencia, contas, meses_decorridos): #Função para calcular o rendimento da poupança
+    indice = verificador_existencia(contas,num_conta,num_agencia)
+
+    if indice == -1:
+        return -1
+
+    if contas[indice]["tipo_conta"] != 2:
+        return -2
+
+    if meses_decorridos <= 0:
+        return -3
+
+    rendimento = contas[indice]["saldo"] * 0.005 * meses_decorridos
+    novo_saldo = contas[indice]["saldo"] + rendimento
+    contas[indice]["saldo"] = novo_saldo
+
+    return novo_saldo

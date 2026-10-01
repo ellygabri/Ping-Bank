@@ -1,5 +1,3 @@
-cpf_clientes = []
-
 # Função de apoio, não precisa aparecer como opção no menu. Está sendo utilizada para evitar repetir a lógica de busca em todas as partes em que seriam necessárias.
 
 def buscar_cliente(clientes, cpf):

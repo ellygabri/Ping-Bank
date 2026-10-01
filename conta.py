@@ -27,17 +27,17 @@ def gerar_numero_conta(contas, num_agencia):
                 maior_numero = num_conta
     return maior_numero + 1
 
-def criar_conta(contas, clientes, agencias, num_agencia, tipo_conta, saldo, titulares): #Criação da conta e adição dos dados relacionados.   
+def criar_conta(contas, clientes, agencias, num_agencia, tipo_titulares, saldo, titulares, tipo_conta): #Criação da conta e adição dos dados relacionados.   
     indice_agencia = buscar_agencia(agencias, num_agencia)
     if indice_agencia == -1:
         return -1
-    if tipo_conta != 1 and tipo_conta != 2:
+    if tipo_titulares != 1 and tipo_titulares != 2:
         return -2
     if saldo < 0:
         return -3
-    if tipo_conta == 1 and len(titulares) != 1:
+    if tipo_titulares == 1 and len(titulares) != 1:
         return -4
-    elif tipo_conta == 2 and len(titulares) < 2:
+    elif tipo_titulares == 2 and len(titulares) < 2:
         return -4
 
     for cpf in titulares:
@@ -47,9 +47,10 @@ def criar_conta(contas, clientes, agencias, num_agencia, tipo_conta, saldo, titu
     num_conta = gerar_numero_conta(contas, num_agencia)
     conta = {
         "num_agencia" : num_agencia,
-        "tipo_conta" : tipo_conta,
+        "tipo_titulares" : tipo_titulares,
         "saldo" : saldo,
-        "titulares" : titulares
+        "titulares" : titulares,
+        "tipo_conta" : tipo_conta
     }
 
     return conta, num_conta #Como a chamada da função gira em torno de ter "conta" diretamente e a adição é feita lá mesmo, tornou-se necessário
@@ -76,6 +77,8 @@ def deposito(contas, num_conta, num_agencia, cpf, valor_deposito): #Aumenta o sa
         return -2
     if valor_deposito <= 0:
         return 0
+    if contas[indice]["tipo_conta"] == "salario":
+        return -2
     contas[indice]["saldo"] += valor_deposito
     return 1
 
@@ -107,7 +110,7 @@ def transferencia(contas, conta_origem, agencia_origem, cpf, conta_destino, agen
     if indice_origem == -1:
         return -1
     if verificacao_seguranca(contas, indice_origem, cpf) != 1:
-        return -2
+        return -5
     indice_destino = verificador_existencia(contas, conta_destino, agencia_destino)
     if indice_destino == -1:
         return -3
@@ -115,6 +118,9 @@ def transferencia(contas, conta_origem, agencia_origem, cpf, conta_destino, agen
         return -4
     if valor <= 0:
         return 0
+    if contas[indice_origem]["tipo_conta"] == "salario":
+        if cpf not in contas[indice_destino]["titulares"]:
+            return -2
     origem = contas[indice_origem]
 
 
@@ -147,7 +153,7 @@ def adicionar_titular(contas, clientes, num_conta, num_agencia, cpf_validacao, n
         return -1
     if verificacao_seguranca(contas, indice, cpf_validacao) != 1:
         return -2
-    if contas[indice]["tipo_conta"] == 1:
+    if contas[indice]["tipo_titulares"] == 1:
         return -4
     for cpf_novo in novo_titular:
         if buscar_cliente(clientes, cpf_novo) == -1:
@@ -171,7 +177,7 @@ def substituir_titular(contas, clientes, num_conta, num_agencia, cpf_validacao, 
 
     if verificacao_seguranca(contas,indice,cpf_validacao) != 1:
         return -2
-    if contas[indice]["tipo_conta"] == 1 and len(novo_titular) != 1:
+    if contas[indice]["tipo_titulares"] == 1 and len(novo_titular) != 1:
         return -4
     titulares = contas[indice]["titulares"]
     for cpf_novo in novo_titular:

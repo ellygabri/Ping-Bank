@@ -1,358 +1,1235 @@
 import json
 
-import agencia
-import cliente
-import conta
+from clientes import cadastrar_cliente, procurar_cliente, listar_clientes, editar_cliente, excluir_cliente
 
-CAMINHO_DADOS = "ping_bank_dados.json"
+from agencias import buscar_agencia, cadastrar_agencia, procurar_agencia, listar_agencias
 
+from contas import criar_conta, procurar_conta, listar_contas, deposito, saque, consultar_saldo, transferencia, listar_contas_clientes, listar_titulares, adicionar_titular, remover_titular, substituir_titular, excluir_conta, calculo_poupanca
 
-def ler_inteiro(mensagem, minimo=None):
-    valor = input(mensagem).strip()
-    while not valor.isdigit() or (minimo is not None and int(valor) < minimo):
-        print("Digite um número válido.")
-        valor = input(mensagem).strip()
-    return int(valor)
+from relatorio import montante_agencia, quantidade_contas_agencia, resumo_bancario
 
+# Função para carregar os dados armazenados no JSON
+def carregar_dados():
 
-def ler_float(mensagem, minimo=None):
-    valor = input(mensagem).strip().replace(",", ".")
-    valido = False
-    numero = 0.0
-    while not valido:
-        try:
-            numero = float(valor)
-            valido = minimo is None or numero >= minimo
-        except ValueError:
-            valido = False
-        if not valido:
-            print("Digite um valor válido.")
-            valor = input(mensagem).strip().replace(",", ".")
-    return numero
+    arquivo = open(
+        "ping_bank_dados.json",
+        "r",
+        encoding="utf-8"
+    )
 
+    dados = json.load(arquivo)
 
-def cadastrar_cliente_fluxo(lista_clientes):
-    print("\n--- Cadastro de Cliente ---")
-    cpf = input("CPF: ").strip()
-    if cliente.buscar_cliente(lista_clientes, cpf) != -1:
-        print("Já existe um cliente com esse CPF.")
-        return
-    dados = [
-        input("Nome completo: ").strip(), cpf,
-        input("Telefone/contato: ").strip(), input("Endereço: ").strip(),
-        input("Data de nascimento (dd/mm/aaaa): ").strip(), input("E-mail: ").strip(),
-    ]
-    novo_cliente = cliente.cadastrar_cliente(*dados)
-    if novo_cliente is False:
-        print("Erro: todos os campos são obrigatórios.")
-        return
-    lista_clientes.append(novo_cliente)
-    print("Cliente cadastrado com sucesso.")
+    arquivo.close()
 
+    clientes = dados["clientes"]
+    agencias = dados["agencias"]
+    contas = dados["contas"]
 
-def editar_cliente_fluxo(lista_clientes):
-    cpf = input("CPF do cliente: ").strip()
-    indice = cliente.buscar_cliente(lista_clientes, cpf)
-    if indice == -1:
-        print("Cliente não encontrado.")
-        return
-    atual = lista_clientes[indice]
-    dados = [
-        input(f"Nome completo [{atual[0]}]: ").strip() or atual[0], cpf,
-        input(f"Telefone/contato [{atual[2]}]: ").strip() or atual[2],
-        input(f"Endereço [{atual[3]}]: ").strip() or atual[3],
-        input(f"Data de nascimento [{atual[4]}]: ").strip() or atual[4],
-        input(f"E-mail [{atual[5]}]: ").strip() or atual[5],
-    ]
-    cliente.editar_cliente(lista_clientes, *dados)
-
-
-def excluir_cliente_fluxo(lista_clientes, lista_contas):
-    cpf = input("CPF do cliente: ").strip()
-    resultado = cliente.excluir_cliente(lista_clientes, lista_contas, cpf)
-    mensagens = {
-        -1: "Cliente não encontrado.",
-        0: "O cliente ainda é titular de uma conta.",
-        1: "Cliente excluído com sucesso.",
-    }
-    print(mensagens[resultado])
-
-
-def menu_clientes(lista_clientes, lista_contas):
-    opcao = ""
-    while opcao != "0":
-        print("\n===== CLIENTES =====")
-        print("1 - Cadastrar cliente\n2 - Listar clientes\n3 - Procurar cliente")
-        print("4 - Editar cliente\n5 - Excluir cliente\n0 - Voltar")
-        opcao = input("Escolha uma opção: ").strip()
-        if opcao == "1":
-            cadastrar_cliente_fluxo(lista_clientes)
-        elif opcao == "2":
-            cliente.listar_clientes(lista_clientes)
-        elif opcao == "3":
-            cliente.procurar_cliente(lista_clientes, input("CPF: ").strip())
-        elif opcao == "4":
-            editar_cliente_fluxo(lista_clientes)
-        elif opcao == "5":
-            excluir_cliente_fluxo(lista_clientes, lista_contas)
-        elif opcao != "0":
-            print("Opção inválida.")
-
-
-def cadastrar_agencia_fluxo(lista_agencias):
-    print("\n--- Cadastro de Agência ---")
-    numero = input("Número da agência: ").strip()
-    nome = input("Nome/localização: ").strip()
-    nova_agencia = agencia.cadastrar_agencia(lista_agencias, numero, nome)
-    if nova_agencia == 0:
-        print("Erro: todos os campos são obrigatórios.")
-        return
-    if nova_agencia == 1:
-        print("Erro: essa agência já está cadastrada.")
-        return
-    lista_agencias.append(nova_agencia)
-    print("Agência cadastrada com sucesso.")
-
-
-def menu_agencias(lista_agencias):
-    opcao = ""
-    while opcao != "0":
-        print("\n===== AGÊNCIAS =====")
-        print("1 - Cadastrar agência\n2 - Listar agências\n3 - Procurar agência\n0 - Voltar")
-        opcao = input("Escolha uma opção: ").strip()
-        if opcao == "1":
-            cadastrar_agencia_fluxo(lista_agencias)
-        elif opcao == "2":
-            agencia.listar_agencias(lista_agencias)
-        elif opcao == "3":
-            agencia.procurar_agencia(lista_agencias, input("Número: ").strip())
-        elif opcao != "0":
-            print("Opção inválida.")
-
-
-def cadastrar_conta_fluxo(lista_contas, lista_clientes, lista_agencias):
-    numero_agencia = input("Número da agência: ").strip()
-    tipo = ler_inteiro("Tipo (1 - individual, 2 - conjunta): ", 1)
-    while tipo not in (1, 2):
-        print("Escolha o tipo 1 ou 2.")
-        tipo = ler_inteiro("Tipo (1 - individual, 2 - conjunta): ", 1)
-    texto = input("CPF(s) do(s) titular(es), separados por vírgula: ")
-    saldo = ler_float("Saldo inicial: ", 0)
-    titulares = tuple(cpf.strip() for cpf in texto.split(",") if cpf.strip())
-    nova_conta = conta.criar_conta(lista_contas, lista_clientes, lista_agencias, numero_agencia, tipo, saldo, titulares)
-    mensagens = {-1: "Agência não encontrada.", -2: "Tipo de conta inválido.", -3: "O saldo não pode ser negativo.", -4: "Conta individual deve ter um titular.", -5: "Um dos titulares não está cadastrado.", -6: "Não repita titulares."}
-    if nova_conta in mensagens:
-        print(mensagens[nova_conta])
-        return
-    lista_contas.append(nova_conta)
-    print(f"Conta {nova_conta[0]} criada com sucesso.")
-
-
-def listar_contas_fluxo(lista_contas):
-    contas = conta.listar_contas(lista_contas)
-    if contas is False:
-        print("Nenhuma conta cadastrada.")
-        return
-    print("\n========== CONTAS ==========")
-    for conta_atual in contas:
-        titulares = ", ".join(conta_atual[4])
-        print(f"Número: {conta_atual[0]} | Agência: {conta_atual[1]} | Tipo: {conta_atual[2]} | Saldo: R$ {conta_atual[3]:.2f} | Titulares: {titulares}")
-
-
-def consultar_saldo_fluxo(lista_contas):
-    numero = ler_inteiro("Número da conta: ")
-    numero_agencia = input("Número da agência: ").strip()
-    cpf = input("CPF do titular: ").strip()
-    saldo = conta.consultar_saldo(lista_contas, numero, numero_agencia, cpf)
-    if saldo == -1:
-        print("Conta não encontrada.")
-    elif saldo == -2:
-        print("CPF não autorizado.")
-    else:
-        print(f"Saldo: R$ {saldo:.2f}")
-
-
-def menu_contas(lista_contas, lista_clientes, lista_agencias):
-    opcao = ""
-    while opcao != "0":
-        print("\n===== CONTAS =====")
-        print("1 - Cadastrar conta\n2 - Listar contas\n3 - Consultar saldo\n0 - Voltar")
-        opcao = input("Escolha uma opção: ").strip()
-        if opcao == "1":
-            cadastrar_conta_fluxo(lista_contas, lista_clientes, lista_agencias)
-        elif opcao == "2":
-            listar_contas_fluxo(lista_contas)
-        elif opcao == "3":
-            consultar_saldo_fluxo(lista_contas)
-        elif opcao != "0":
-            print("Opção inválida.")
-
-
-def deposito_fluxo(lista_contas):
-    numero = ler_inteiro("Número da conta: ")
-    numero_agencia = input("Número da agência: ").strip()
-    cpf = input("CPF do titular: ").strip()
-    valor = ler_float("Valor do depósito: ", 0)
-    resultado = conta.deposito(lista_contas, numero, numero_agencia, cpf, valor)
-    mensagens = {-1: "Conta não encontrada.", -2: "CPF não autorizado.", 0: "Valor inválido.", 1: "Depósito realizado."}
-    print(mensagens[resultado])
-
-
-def saque_fluxo(lista_contas):
-    numero = ler_inteiro("Número da conta: ")
-    numero_agencia = input("Número da agência: ").strip()
-    cpf = input("CPF do titular: ").strip()
-    valor = ler_float("Valor do saque: ", 0)
-    resultado = conta.saque(lista_contas, numero, numero_agencia, cpf, valor)
-    mensagens = {-1: "Conta não encontrada.", -2: "CPF não autorizado.", 0: "Valor inválido.", -3: "Saldo insuficiente.", 1: "Saque realizado."}
-    print(mensagens[resultado])
-
-
-def transferencia_fluxo(lista_contas):
-    conta_origem = ler_inteiro("Conta de origem: ")
-    agencia_origem = input("Agência de origem: ").strip()
-    cpf = input("CPF do titular da origem: ").strip()
-    conta_destino = ler_inteiro("Conta de destino: ")
-    agencia_destino = input("Agência de destino: ").strip()
-    valor = ler_float("Valor da transferência: ", 0)
-    resultado = conta.tranferencia(lista_contas, conta_origem, agencia_origem, cpf, conta_destino, agencia_destino, valor)
-    mensagens = {-1: "Conta de origem não encontrada.", -2: "CPF não autorizado.", -3: "Conta de destino não encontrada.", -4: "A origem e o destino são iguais.", 0: "Valor inválido.", -5: "Saldo insuficiente.", 1: "Transferência realizada."}
-    print(mensagens[resultado])
-
-
-def menu_operacoes(lista_contas):
-    opcao = ""
-    while opcao != "0":
-        print("\n===== OPERAÇÕES =====")
-        print("1 - Depositar\n2 - Sacar\n3 - Transferir\n0 - Voltar")
-        opcao = input("Escolha uma opção: ").strip()
-        if opcao == "1":
-            deposito_fluxo(lista_contas)
-        elif opcao == "2":
-            saque_fluxo(lista_contas)
-        elif opcao == "3":
-            transferencia_fluxo(lista_contas)
-        elif opcao != "0":
-            print("Opção inválida.")
-
-
-def menu_relatorios(lista_contas, lista_agencias):
-    opcao = ""
-    while opcao != "0":
-        print("\n===== RELATÓRIOS =====")
-        print("1 - Montante de uma agência\n2 - Montante total do banco\n0 - Voltar")
-        opcao = input("Escolha uma opção: ").strip()
-        if opcao == "1":
-            numero = input("Número da agência: ").strip()
-            if agencia.buscar_agencia(lista_agencias, numero) == -1:
-                print("Agência não encontrada.")
-            else:
-                contas_agencia = [item for item in lista_contas if item[1] == numero]
-                total = sum(item[3] for item in contas_agencia)
-                print(f"Quantidade de contas: {len(contas_agencia)}")
-                print(f"Montante: R$ {total:.2f}")
-        elif opcao == "2":
-            total = sum(item[3] for item in lista_contas)
-            print(f"Total de contas: {len(lista_contas)}")
-            print(f"Montante total: R$ {total:.2f}")
-        elif opcao != "0":
-            print("Opção inválida.")
-
-
-def salvar_dados(lista_clientes, lista_agencias, lista_contas, caminho=CAMINHO_DADOS):
-    dados = {
-        "clientes": [
-            {
-                "nome": cliente_atual[0],
-                "cpf": cliente_atual[1],
-                "contato": cliente_atual[2],
-                "endereco": cliente_atual[3],
-                "data_nascimento": cliente_atual[4],
-                "email": cliente_atual[5],
-            }
-            for cliente_atual in lista_clientes
-        ],
-        "agencias": [
-            {"numero": agencia_atual[0], "nome": agencia_atual[1]}
-            for agencia_atual in lista_agencias
-        ],
-        "contas": [
-            {
-                "numero": conta_atual[0],
-                "agencia": conta_atual[1],
-                "tipo": conta_atual[2],
-                "saldo": conta_atual[3],
-                "titulares": list(conta_atual[4]),
-            }
-            for conta_atual in lista_contas
-        ],
-    }
-    try:
-        with open(caminho, "w", encoding="utf-8") as arquivo:
-            json.dump(dados, arquivo, ensure_ascii=False, indent=4)
-        print(f"Dados salvos com sucesso em '{caminho}'.")
-    except OSError as erro:
-        print(f"Erro ao salvar os dados: {erro}")
-
-
-def carregar_dados(caminho=CAMINHO_DADOS):
-    try:
-        with open(caminho, "r", encoding="utf-8") as arquivo:
-            dados = json.load(arquivo)
-    except FileNotFoundError:
-        return [], [], []
-    except (OSError, json.JSONDecodeError):
-        print(f"Não foi possível ler os dados de '{caminho}'.")
-        return [], [], []
-
-    if not isinstance(dados, dict):
-        print("Formato de dados inválido.")
-        return [], [], []
-
-    clientes = [
-        (
-            item["nome"], item["cpf"], item["contato"], item["endereco"],
-            item["data_nascimento"], item["email"],
-        )
-        for item in dados.get("clientes", [])
-    ]
-    agencias = [
-        (item["numero"], item["nome"])
-        for item in dados.get("agencias", [])
-    ]
-    contas = [
-        (
-            item["numero"], item["agencia"], item["tipo"], item["saldo"],
-            tuple(item["titulares"]),
-        )
-        for item in dados.get("contas", [])
-    ]
     return clientes, agencias, contas
 
+# Função para salvar os dados no JSON
+def salvar_dados(clientes, agencias, contas):
 
-def iniciar():
-    lista_clientes, lista_agencias, lista_contas = carregar_dados()
+    dados = {
+        "clientes": clientes,
+        "agencias": agencias,
+        "contas": contas
+    }
+
+    arquivo = open(
+        "ping_bank_dados.json",
+        "w",
+        encoding="utf-8"
+    )
+
+    json.dump(
+        dados,
+        arquivo,
+        ensure_ascii=False,
+        indent=4
+    )
+
+    arquivo.close()
+
+# Confere os caracteres antes de converter a entrada para inteiro.
+def ler_inteiro(mensagem):
+    valido = False
+
+    while valido == False:
+        entrada = input(mensagem).strip()
+        valido = True
+        quantidade_digitos = 0
+
+        for i in range(len(entrada)):
+            if entrada[i] in "0123456789":
+                quantidade_digitos += 1
+            elif i == 0 and (entrada[i] == "-" or entrada[i] == "+"):
+                valido = True
+            else:
+                valido = False
+
+        if quantidade_digitos == 0:
+            valido = False
+
+        if valido == False:
+            print("Entrada inválida. Digite um número inteiro.")
+
+    return int(entrada)
+
+# Aceita um separador decimal, ponto ou virgula, e exige algum digito.
+def ler_valor(mensagem):
+    valido = False
+
+    while valido == False:
+        entrada = input(mensagem).strip()
+        numero = ""
+        quantidade_digitos = 0
+        quantidade_separadores = 0
+        valido = True
+
+        for i in range(len(entrada)):
+            if entrada[i] in "0123456789":
+                numero = numero + entrada[i]
+                quantidade_digitos += 1
+            elif entrada[i] == "." or entrada[i] == ",":
+                numero = numero + "."
+                quantidade_separadores += 1
+            elif i == 0 and (entrada[i] == "-" or entrada[i] == "+"):
+                numero = numero + entrada[i]
+            else:
+                valido = False
+
+        if quantidade_digitos == 0 or quantidade_separadores > 1:
+            valido = False
+
+        if valido == False:
+            print("Entrada inválida. Digite um valor numérico.")
+
+    return float(numero)
+
+# Função utilizada apenas para mostrar os dados de um cliente
+def exibir_cliente(cliente):
+
+    print("Nome:", cliente["nome"])
+    print("CPF:", cliente["cpf"])
+    print("Contato:", cliente["contato"])
+    print("Endereço:", cliente["endereco"])
+    print("Data de nascimento:", cliente["data_nascimento"])
+    print("E-mail:", cliente["email"])
+
+# Função utilizada apenas para mostrar os dados de uma agência
+def exibir_agencia(agencia):
+
+    print("Número da agência:", agencia["num_agencia"])
+    print("Nome da agência:", agencia["nome_agencia"])
+
+# Função para identificar o tipo da conta
+def nome_tipo_conta(tipo_conta):
+
+    if tipo_conta == 1:
+        return "Corrente"
+
+    elif tipo_conta == 2:
+        return "Poupança"
+
+    elif tipo_conta == 3:
+        return "Salário"
+
+    return "Tipo inválido"
+
+# Função para identificar se a conta é individual ou conjunta
+def nome_tipo_titulares(tipo_titulares):
+
+    if tipo_titulares == 1:
+        return "Individual"
+
+    elif tipo_titulares == 2:
+        return "Conjunta"
+
+    return "Tipo inválido"
+
+# Função utilizada apenas para mostrar os dados de uma conta
+def exibir_conta(conta):
+
+    print("Número da conta:", conta["num_conta"])
+    print("Agência:", conta["num_agencia"])
+    print("Tipo da conta:", nome_tipo_conta(conta["tipo_conta"]))
+    print(
+        "Titularidade:",
+        nome_tipo_titulares(conta["tipo_titulares"])
+    )
+    print("Saldo: R$", conta["saldo"])
+
+    print("Titulares:")
+
+    for cpf in conta["titulares"]:
+        print("-", cpf)
+
+# Menu referente aos clientes
+def menu_clientes(clientes, contas):
+
     opcao = ""
-    print("=" * 40)
-    print("       BEM-VINDO AO PING-BANK")
-    print("=" * 40)
+
     while opcao != "0":
-        print("\n========== MENU PRINCIPAL ==========")
-        print("1 - Clientes\n2 - Agências\n3 - Contas\n4 - Operações")
-        print("5 - Relatórios\n6 - Salvar dados\n0 - Sair")
-        opcao = input("Escolha uma opção: ").strip()
+
+        print("========== CLIENTES ==========")
+        print("1 - Cadastrar cliente")
+        print("2 - Procurar cliente")
+        print("3 - Listar clientes")
+        print("4 - Editar cliente")
+        print("5 - Excluir cliente")
+        print("0 - Voltar")
+
+        opcao = input("Escolha uma opção: ")
+
         if opcao == "1":
-            menu_clientes(lista_clientes, lista_contas)
+
+            nome = input("Nome: ")
+            cpf = input("CPF: ")
+            contato = input("Contato: ")
+            endereco = input("Endereço: ")
+            data_nascimento = input("Data de nascimento: ")
+            email = input("E-mail: ")
+            
+            resultado = cadastrar_cliente(
+                clientes,
+                nome,
+                cpf,
+                contato,
+                endereco,
+                data_nascimento,
+                email
+            )
+
+            if resultado == -2:
+                print("CPF inválido.")
+
+            elif resultado == -1:
+                print("Existem campos vazios.")
+
+            elif resultado == 0:
+                print("Já existe um cliente com esse CPF.")
+
+            elif resultado == 1:
+                print("Cliente cadastrado com sucesso.")
+
         elif opcao == "2":
-            menu_agencias(lista_agencias)
+
+            cpf = input("CPF do cliente: ")
+
+            cliente = procurar_cliente(
+                clientes,
+                cpf
+            )
+
+            if cliente == False:
+                print("Cliente não encontrado.")
+
+            else:
+                exibir_cliente(cliente)
+
         elif opcao == "3":
-            menu_contas(lista_contas, lista_clientes, lista_agencias)
+
+            resultado = listar_clientes(clientes)
+
+            if resultado == False:
+                print("Nenhum cliente cadastrado.")
+
+            else:
+
+                for cliente in resultado:
+
+                    print("------------------------------")
+                    exibir_cliente(cliente)
+
         elif opcao == "4":
-            menu_operacoes(lista_contas)
+
+            cpf = input("CPF do cliente: ")
+
+            print("1 - Nome")
+            print("2 - Contato")
+            print("3 - Endereço")
+            print("4 - Data de nascimento")
+            print("5 - E-mail")
+
+            campo_escolhido = input(
+                "Qual informação deseja alterar? "
+            )
+
+            campo = ""
+
+            if campo_escolhido == "1":
+                campo = "nome"
+
+            elif campo_escolhido == "2":
+                campo = "contato"
+
+            elif campo_escolhido == "3":
+                campo = "endereco"
+
+            elif campo_escolhido == "4":
+                campo = "data_nascimento"
+
+            elif campo_escolhido == "5":
+                campo = "email"
+
+            if campo == "":
+                print("Campo inválido.")
+
+            else:
+
+                nova_info = input(
+                    "Digite a nova informação: "
+                )
+
+                resultado = editar_cliente(
+                    clientes,
+                    cpf,
+                    campo,
+                    nova_info
+                )
+
+                if resultado == -2:
+                    print("Campo inválido.")
+
+                elif resultado == -1:
+                    print("Cliente não encontrado.")
+
+                elif resultado == 0:
+                    print("A nova informação não pode ser vazia.")
+
+                elif resultado == 1:
+                    print("Cliente alterado com sucesso.")
+
         elif opcao == "5":
-            menu_relatorios(lista_contas, lista_agencias)
-        elif opcao == "6":
-            salvar_dados(lista_clientes, lista_agencias, lista_contas)
+
+            cpf = input("CPF do cliente: ")
+
+            resultado = excluir_cliente(
+                clientes,
+                contas,
+                cpf
+            )
+
+            if resultado == -1:
+                print("Cliente não encontrado.")
+
+            elif resultado == 0:
+                print(
+                    "O cliente ainda é titular de uma conta."
+                )
+
+            elif resultado == 1:
+                print("Cliente excluído com sucesso.")
+
+
         elif opcao != "0":
+
             print("Opção inválida.")
-    print("Obrigado por usar o Ping-Bank. Até logo!")
+
+# Menu referente às agências
+def menu_agencias(agencias):
+
+    opcao = ""
+
+    while opcao != "0":
+
+        print("========== AGÊNCIAS ==========")
+        print("1 - Cadastrar agência")
+        print("2 - Procurar agência")
+        print("3 - Listar agências")
+        print("0 - Voltar")
+
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == "1":
+
+            num_agencia = input(
+                "Número da agência: "
+            )
+
+            nome_agencia = input(
+                "Nome da agência: "
+            )
+
+            resultado = cadastrar_agencia(
+                agencias,
+                num_agencia,
+                nome_agencia
+            )
+
+            if resultado == -1:
+                print("Existem campos vazios.")
+
+            elif resultado == 0:
+                print("Agência já cadastrada.")
+
+            elif resultado == 1:
+                print("Agência cadastrada com sucesso.")
+
+
+        elif opcao == "2":
+
+            num_agencia = input(
+                "Número da agência: "
+            )
+
+            agencia = procurar_agencia(
+                agencias,
+                num_agencia
+            )
+
+            if agencia == False:
+                print("Agência não encontrada.")
+
+            else:
+                exibir_agencia(agencia)
+
+
+        elif opcao == "3":
+
+            resultado = listar_agencias(agencias)
+
+            if resultado == False:
+                print("Nenhuma agência cadastrada.")
+
+            else:
+
+                for agencia in resultado:
+
+                    print("------------------------------")
+                    exibir_agencia(agencia)
+
+        elif opcao != "0":
+
+            print("Opção inválida.")
+
+# Menu referente às contas
+def menu_contas(clientes, agencias, contas):
+
+    opcao = ""
+
+    while opcao != "0":
+
+        print("========== CONTAS ==========")
+        print("1 - Criar conta")
+        print("2 - Procurar conta")
+        print("3 - Listar contas")
+        print("4 - Listar contas de um cliente")
+        print("5 - Listar titulares")
+        print("6 - Adicionar titular")
+        print("7 - Remover titular")
+        print("8 - Substituir titular")
+        print("9 - Excluir conta")
+        print("0 - Voltar")
+
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == "1":
+
+            num_agencia = input(
+                "Número da agência: "
+            )
+
+            print("1 - Conta individual")
+            print("2 - Conta conjunta")
+
+            tipo_titulares = ler_inteiro("Tipo de titularidade: ")
+
+            titulares = []
+
+            if tipo_titulares == 1:
+
+                cpf = input(
+                    "CPF do titular: "
+                )
+
+                titulares.append(cpf)
+
+
+            elif tipo_titulares == 2:
+
+                quantidade = ler_inteiro("Quantidade de titulares: ")
+
+                i = 0
+
+                while i < quantidade:
+
+                    cpf = input(
+                        "CPF do titular: "
+                    )
+
+                    titulares.append(cpf)
+
+                    i += 1
+
+            saldo = ler_valor("Saldo inicial: R$ ")
+
+            print("1 - Conta corrente")
+            print("2 - Conta poupança")
+            print("3 - Conta salário")
+
+            tipo_conta = ler_inteiro("Tipo da conta: ")
+
+            resultado = criar_conta(
+                contas,
+                clientes,
+                agencias,
+                num_agencia,
+                tipo_titulares,
+                saldo,
+                titulares,
+                tipo_conta
+            )
+
+            if resultado == -1:
+                print("Agência não encontrada.")
+
+            elif resultado == -2:
+                print("Tipo de titularidade inválido.")
+
+            elif resultado == -3:
+                print("Saldo inicial inválido.")
+
+            elif resultado == -4:
+                print(
+                    "Quantidade de titulares inválida."
+                )
+
+            elif resultado == -5:
+                print(
+                    "Um dos titulares não está cadastrado."
+                )
+
+            elif resultado == -6:
+                print("Tipo de conta inválido.")
+
+            elif resultado == -7:
+                print("Existem titulares repetidos.")
+
+            else:
+
+                contas.append(resultado)
+
+                print("Conta criada com sucesso.")
+                print(
+                    "Número da conta:",
+                    resultado["num_conta"]
+                )
+
+        elif opcao == "2":
+
+            num_conta = ler_inteiro("Número da conta: ")
+
+            num_agencia = input(
+                "Número da agência: "
+            )
+
+            cpf = input(
+                "CPF de um titular: "
+            )
+
+            resultado = procurar_conta(
+                contas,
+                num_conta,
+                num_agencia,
+                cpf
+            )
+
+            if resultado == False:
+                print("Conta não encontrada.")
+
+            elif resultado == -2:
+                print("CPF não autorizado.")
+
+            else:
+                exibir_conta(resultado)
+
+        elif opcao == "3":
+
+            resultado = listar_contas(contas)
+
+            if resultado == False:
+                print("Nenhuma conta cadastrada.")
+
+            else:
+
+                for conta in resultado:
+
+                    print("------------------------------")
+                    exibir_conta(conta)
+
+
+        elif opcao == "4":
+
+            cpf = input(
+                "CPF do cliente: "
+            )
+
+            resultado = listar_contas_clientes(
+                contas,
+                cpf
+            )
+
+            if resultado == False:
+                print(
+                    "O cliente não possui contas."
+                )
+
+            else:
+
+                for conta in resultado:
+
+                    print("------------------------------")
+                    exibir_conta(conta)
+
+
+        elif opcao == "5":
+
+            num_conta = ler_inteiro("Número da conta: ")
+
+            num_agencia = input(
+                "Número da agência: "
+            )
+
+            resultado = listar_titulares(
+                contas,
+                num_conta,
+                num_agencia
+            )
+
+            if resultado == False:
+                print("Conta não encontrada.")
+
+            else:
+
+                print("Titulares:")
+
+                for cpf in resultado:
+                    print("-", cpf)
+
+        elif opcao == "6":
+
+            num_conta = ler_inteiro("Número da conta: ")
+
+            num_agencia = input(
+                "Número da agência: "
+            )
+
+            cpf_validacao = input(
+                "CPF de um titular atual: "
+            )
+
+            novo_titular = input(
+                "CPF do novo titular: "
+            )
+
+            resultado = adicionar_titular(
+                contas,
+                clientes,
+                num_conta,
+                num_agencia,
+                cpf_validacao,
+                novo_titular
+            )
+
+            if resultado == -1:
+                print("Conta não encontrada.")
+
+            elif resultado == -2:
+                print("CPF não autorizado.")
+
+            elif resultado == -3:
+                print("Novo titular não cadastrado.")
+
+            elif resultado == 0:
+                print(
+                    "Esse cliente já é titular da conta."
+                )
+
+            elif resultado == 1:
+                print(
+                    "Titular adicionado com sucesso."
+                )
+
+        elif opcao == "7":
+
+            num_conta = ler_inteiro("Número da conta: ")
+
+            num_agencia = input(
+                "Número da agência: "
+            )
+
+            cpf_validacao = input(
+                "CPF de um titular atual: "
+            )
+
+            titular_removido = input(
+                "CPF do titular que será removido: "
+            )
+
+            resultado = remover_titular(
+                contas,
+                num_conta,
+                num_agencia,
+                cpf_validacao,
+                titular_removido
+            )
+
+            if resultado == -1:
+                print("Conta não encontrada.")
+
+            elif resultado == -2:
+                print("CPF não autorizado.")
+
+            elif resultado == -3:
+                print(
+                    "A conta não pode ficar sem titular."
+                )
+
+            elif resultado == 0:
+                print(
+                    "O CPF informado não é titular da conta."
+                )
+
+            elif resultado == 1:
+                print(
+                    "Titular removido com sucesso."
+                )
+
+        elif opcao == "8":
+
+            num_conta = ler_inteiro("Número da conta: ")
+
+            num_agencia = input(
+                "Número da agência: "
+            )
+
+            cpf_validacao = input(
+                "CPF de um titular atual: "
+            )
+
+            titular_antigo = input(
+                "CPF que será substituído: "
+            )
+
+            novo_titular = input(
+                "CPF do novo titular: "
+            )
+
+            resultado = substituir_titular(
+                contas,
+                clientes,
+                num_conta,
+                num_agencia,
+                cpf_validacao,
+                titular_antigo,
+                novo_titular
+            )
+
+            if resultado == -1:
+                print("Conta não encontrada.")
+
+            elif resultado == -2:
+                print("CPF não autorizado.")
+
+            elif resultado == -3:
+                print(
+                    "Novo titular não cadastrado."
+                )
+
+            elif resultado == -4:
+                print(
+                    "O novo cliente já é titular."
+                )
+
+            elif resultado == 0:
+                print(
+                    "Titular antigo não encontrado."
+                )
+
+            elif resultado == 1:
+                print(
+                    "Titular substituído com sucesso."
+                )
+
+        elif opcao == "9":
+
+            num_conta = ler_inteiro("Número da conta: ")
+
+            num_agencia = input(
+                "Número da agência: "
+            )
+
+            cpf = input(
+                "CPF de um titular: "
+            )
+
+            resultado = excluir_conta(
+                contas,
+                num_conta,
+                num_agencia,
+                cpf
+            )
+
+            if resultado == -1:
+                print("Conta não encontrada.")
+
+            elif resultado == -2:
+                print("CPF não autorizado.")
+
+            elif resultado == 0:
+                print(
+                    "A conta precisa estar com saldo zero."
+                )
+
+            elif resultado == 1:
+                print("Conta excluída com sucesso.")
+
+        elif opcao != "0":
+
+            print("Opção inválida.")
+
+# Menu referente às operações bancárias
+def menu_operacoes(contas):
+
+    opcao = ""
+
+    while opcao != "0":
+
+        print("========== OPERAÇÕES ==========")
+        print("1 - Consultar saldo")
+        print("2 - Depositar")
+        print("3 - Sacar")
+        print("4 - Transferir")
+        print("5 - Aplicar rendimento da poupança")
+        print("0 - Voltar")
+
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == "1":
+
+            num_conta = ler_inteiro("Número da conta: ")
+
+            num_agencia = input(
+                "Número da agência: "
+            )
+
+            cpf = input(
+                "CPF de um titular: "
+            )
+
+            resultado = consultar_saldo(
+                contas,
+                num_conta,
+                num_agencia,
+                cpf
+            )
+
+            if resultado == -1:
+                print("Conta não encontrada.")
+
+            elif resultado == -2:
+                print("CPF não autorizado.")
+
+            else:
+                print("Saldo atual: R$", resultado)
+
+        elif opcao == "2":
+
+            num_conta = ler_inteiro("Número da conta: ")
+
+            num_agencia = input(
+                "Número da agência: "
+            )
+
+            cpf = input(
+                "CPF de um titular: "
+            )
+
+            valor = ler_valor("Valor do depósito: R$ ")
+
+            resultado = deposito(
+                contas,
+                num_conta,
+                num_agencia,
+                cpf,
+                valor
+            )
+
+            if resultado == -1:
+                print("Conta não encontrada.")
+
+            elif resultado == -2:
+                print("CPF não autorizado.")
+
+            elif resultado == -4:
+                print(
+                    "Conta salário não permite essa operação."
+                )
+
+            elif resultado == 0:
+                print("Valor inválido.")
+
+            elif resultado == 1:
+                print("Depósito realizado com sucesso.")
+
+        elif opcao == "3":
+
+            num_conta = ler_inteiro("Número da conta: ")
+
+            num_agencia = input(
+                "Número da agência: "
+            )
+
+            cpf = input(
+                "CPF de um titular: "
+            )
+
+            valor = ler_valor("Valor do saque: R$ ")
+
+            resultado = saque(
+                contas,
+                num_conta,
+                num_agencia,
+                cpf,
+                valor
+            )
+
+            if resultado == -1:
+                print("Conta não encontrada.")
+
+            elif resultado == -2:
+                print("CPF não autorizado.")
+
+            elif resultado == -3:
+                print("Saldo insuficiente.")
+
+            elif resultado == 0:
+                print("Valor inválido.")
+
+            elif resultado == 1:
+                print("Saque realizado com sucesso.")
+
+        elif opcao == "4":
+
+            conta_origem = ler_inteiro("Conta de origem: ")
+
+            agencia_origem = input(
+                "Agência de origem: "
+            )
+
+            cpf = input(
+                "CPF de um titular da conta de origem: "
+            )
+
+            conta_destino = ler_inteiro("Conta de destino: ")
+
+            agencia_destino = input(
+                "Agência de destino: "
+            )
+
+            valor = ler_valor("Valor da transferência: R$ ")
+
+            resultado = transferencia(
+                contas,
+                conta_origem,
+                agencia_origem,
+                cpf,
+                conta_destino,
+                agencia_destino,
+                valor
+            )
+
+            if resultado == -1:
+                print(
+                    "Conta de origem não encontrada."
+                )
+
+            elif resultado == -2:
+                print("CPF não autorizado.")
+
+            elif resultado == -3:
+                print(
+                    "Conta de destino não encontrada."
+                )
+
+            elif resultado == -4:
+                print(
+                    "A conta de origem e destino são iguais."
+                )
+
+            elif resultado == -5:
+                print("Saldo insuficiente.")
+
+            elif resultado == -6:
+                print(
+                    "Conta salário não permite essa operação."
+                )
+
+            elif resultado == 0:
+                print("Valor inválido.")
+
+            elif resultado == 1:
+                print(
+                    "Transferência realizada com sucesso."
+                )
+
+        elif opcao == "5":
+
+            num_conta = ler_inteiro("Número da conta poupança: ")
+
+            num_agencia = input(
+                "Número da agência: "
+            )
+
+            meses_decorridos = ler_inteiro("Quantidade de meses decorridos: ")
+
+            resultado = calculo_poupanca(
+                num_conta,
+                num_agencia,
+                contas,
+                meses_decorridos
+            )
+
+            if resultado == -1:
+                print("Conta não encontrada.")
+
+            elif resultado == -2:
+                print(
+                    "A conta informada não é poupança."
+                )
+
+            elif resultado == -3:
+                print(
+                    "Quantidade de meses inválida."
+                )
+
+            else:
+                print(
+                    "Novo saldo da poupança: R$",
+                    resultado
+                )
+
+        elif opcao != "0":
+
+            print("Opção inválida.")
+
+# Menu referente aos relatórios
+def menu_relatorios(clientes, agencias, contas):
+
+    opcao = ""
+
+    while opcao != "0":
+
+        print("========== RELATÓRIOS ==========")
+        print("1 - Relatório de uma agência")
+        print("2 - Relatório geral do banco")
+        print("0 - Voltar")
+
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == "1":
+
+            num_agencia = input(
+                "Número da agência: "
+            )
+
+            indice = buscar_agencia(
+                agencias,
+                num_agencia
+            )
+
+            if indice == -1:
+                print("Agência não encontrada.")
+
+            else:
+
+                quantidade = quantidade_contas_agencia(
+                    contas,
+                    num_agencia
+                )
+
+                total = montante_agencia(
+                    contas,
+                    num_agencia
+                )
+
+                print(
+                    "Agência:",
+                    num_agencia
+                )
+
+                print(
+                    "Quantidade de contas:",
+                    quantidade
+                )
+
+                print(
+                    "Montante da agência: R$",
+                    total
+                )
+
+        elif opcao == "2":
+
+            resumo = resumo_bancario(
+                clientes,
+                agencias,
+                contas
+            )
+
+            print(
+                "Clientes cadastrados:",
+                resumo["quantidade_clientes"]
+            )
+
+            print(
+                "Agências cadastradas:",
+                resumo["quantidade_agencias"]
+            )
+
+            print(
+                "Contas cadastradas:",
+                resumo["quantidade_contas"]
+            )
+
+            print(
+                "Montante total do banco: R$",
+                resumo["montante_total"]
+            )
+
+            print(
+                "Contas correntes:",
+                resumo["quantidade_corrente"]
+            )
+
+            print(
+                "Montante em contas correntes: R$",
+                resumo["montante_corrente"]
+            )
+
+            print(
+                "Contas poupança:",
+                resumo["quantidade_poupanca"]
+            )
+
+            print(
+                "Montante em poupança: R$",
+                resumo["montante_poupanca"]
+            )
+
+            print(
+                "Contas salário:",
+                resumo["quantidade_salario"]
+            )
+
+            print(
+                "Montante em contas salário: R$",
+                resumo["montante_salario"]
+            )
+
+            print(
+                "Contas individuais:",
+                resumo["quantidade_individuais"]
+            )
+
+            print(
+                "Contas conjuntas:",
+                resumo["quantidade_conjuntas"]
+            )
+
+        elif opcao != "0":
+
+            print("Opção inválida.")
+
+# Função principal do menu
+def executar_menu():
+
+    clientes, agencias, contas = carregar_dados()
+
+    opcao = ""
+
+    while opcao != "0":
+
+        print("========== BANCO VIRTUAL ==========")
+        print("1 - Clientes")
+        print("2 - Agências")
+        print("3 - Contas")
+        print("4 - Operações bancárias")
+        print("5 - Relatórios")
+        print("0 - Sair")
+
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == "1":
+
+            menu_clientes(
+                clientes,
+                contas
+            )
+
+            salvar_dados(
+                clientes,
+                agencias,
+                contas
+            )
+
+
+        elif opcao == "2":
+
+            menu_agencias(
+                agencias
+            )
+
+            salvar_dados(
+                clientes,
+                agencias,
+                contas
+            )
+
+
+        elif opcao == "3":
+
+            menu_contas(
+                clientes,
+                agencias,
+                contas
+            )
+
+            salvar_dados(
+                clientes,
+                agencias,
+                contas
+            )
+
+        elif opcao == "4":
+
+            menu_operacoes(
+                contas
+            )
+
+            salvar_dados(
+                clientes,
+                agencias,
+                contas
+            )
+
+        elif opcao == "5":
+
+            menu_relatorios(
+                clientes,
+                agencias,
+                contas
+            )
+
+        elif opcao != "0":
+
+            print("Opção inválida.")
+
+    salvar_dados(
+        clientes,
+        agencias,
+        contas
+    )
+
+    print("Programa encerrado.")

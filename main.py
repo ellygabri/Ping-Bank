@@ -1,4 +1,3 @@
-from menu import iniciar
+from menu import executar_menu
 
-if __name__ == "__main__":
-    iniciar()
+executar_menu()

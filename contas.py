@@ -12,22 +12,18 @@ def verificador_existencia(contas, num_conta, num_agencia): #Verifica a existên
 
 def verificacao_seguranca(contas, indice, cpf): #Checagem de segurança (uma espécie de senha).
     cpf = normalizar_cpf(cpf)
-
-    titulares = contas[indice]["titulares"]
-
-    if cpf in titulares:
+ 
+    if cpf in contas[indice]["titulares"]:
         return 1
     return 0
 
 def gerar_numero_conta(contas, num_agencia):
 
-    maior_numero = 0
+    agencia = filter(lambda conta: conta["num_agencia"] == num_agencia, contas)
+    maior_numero = max(map(lambda conta: int(conta["num_conta"]), agencia), default = 0)
 
-    for conta in contas:
-        if conta["num_agencia"] == num_agencia:
-            if int(conta["num_conta"]) > maior_numero:
-                maior_numero = int(conta["num_conta"])
     return maior_numero + 1
+
 
 def criar_conta(contas, clientes, agencias, num_agencia, tipo_titulares, saldo, titulares, tipo_conta): #Criação da conta e adição dos dados relacionados. 
 
@@ -64,8 +60,8 @@ def criar_conta(contas, clientes, agencias, num_agencia, tipo_titulares, saldo, 
 
     conta = {"num_conta": num_conta,"num_agencia": num_agencia,"tipo_titulares": tipo_titulares,"saldo": saldo,"titulares": titulares_normalizados,"tipo_conta": tipo_conta}
 
-    return conta #Como a chamada da função gira em torno de ter "conta" diretamente e a adição é feita lá mesmo, tornou-se necessário
-                            # passar também o "num_conta" para permitir a alteração na main: de "lista_contas.append(nova_conta)" para "contas[num_conta] = contas"
+    return conta 
+                            
 
 def procurar_conta(contas, num_conta, num_agencia, cpf):
 
@@ -159,11 +155,7 @@ def listar_contas_clientes(contas, cpf): #Listar todas as contas associadas ao c
 
     cpf = normalizar_cpf(cpf)
 
-    contas_cliente = []
-
-    for conta in contas:
-        if cpf in conta["titulares"]:
-            contas_cliente.append(conta)
+    contas_cliente = list(filter(lambda conta: cpf in conta["titulares"], contas))
 
     if len(contas_cliente) == 0:
         return False
@@ -249,7 +241,6 @@ def substituir_titular(contas, clientes, num_conta, num_agencia, cpf_validacao, 
         return -4
 
     titulares = contas[indice]["titulares"]
-
     for i in range(len(titulares)):
         if titulares[i] == titular_antigo:
             titulares[i] = novo_titular

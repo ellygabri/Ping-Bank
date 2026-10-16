@@ -1,3 +1,3 @@
-from menu import executar_menu
+from app import app
 
-executar_menu()
+app.run(debug = True)

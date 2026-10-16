@@ -1,0 +1,122 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f6fa;
+    color: #222222;
+}
+.cabecalho {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 20px 8%;
+
+    background-color: #1f2937;
+    color: white;
+}
+
+.logo h1{
+    font-size: 24px;
+}
+
+.menu-navegacao{
+    display: flex;
+    gap: 20px;
+}
+
+.menu-navegacao a {
+    color: white;
+    text-decoration: none;
+}
+
+.menu-navegacao a:hover {
+    text-decoration: underline;
+}
+
+.conteudo{
+    width: 85%;
+    margin: 40px auto;
+    min-height: 75vh;
+}
+
+.titulo-pagina{
+    margin-bottom: 30px;
+}
+
+.titulo-pagina h2 {
+    margin-bottom: 8px;
+}
+
+.titulo-pagina p {
+    color: #666666;
+}
+
+.cards-dashboard{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.card {
+    background-color: white;
+    padding: 25px;
+    border-radius: 8px;
+    min-width: 200px;
+    flex: 1;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.card h3{
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #555555;
+}
+
+.valor-card {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.secao-informacoes{
+    background-color: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.secao-informacoes h2{
+    margin-bottom: 20px;
+}
+
+.tabela-container{
+    overflow-x: auto;
+}
+
+table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td{
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #dddddd;
+}
+
+th{
+    background-color: #f1f1f1;
+}
+
+.rodape{
+    text-align: center;
+    padding: 20px;
+    background-color: #1f2937;
+    color: white;
+}

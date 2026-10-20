@@ -73,3 +73,27 @@ def resumo_bancario(clientes, agencias, contas):
         "quantidade_conjuntas": quantidade_tipo_titulares(contas, 2)
     }
     return resumo
+
+#Função para encontrar o menor saldo do banco.
+def menor_saldo(contas): 
+
+    if len(contas) == 0:
+        return False
+    menor_saldo = contas[0]["saldo"]
+    for conta in contas:
+        if conta["saldo"] < menor_saldo:
+            conta_menor_saldo = conta
+
+    return conta_menor_saldo
+
+#Função para encontrar o maior saldo do banco.
+def maior_saldo(contas): 
+
+    if len(contas) == 0:
+        return False
+    maior_saldo = contas[0]["saldo"]
+    for conta in contas:
+        if conta["saldo"] > maior_saldo:
+            conta_maior_saldo = conta
+
+    return conta_maior_saldo

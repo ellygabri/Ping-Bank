@@ -285,24 +285,3 @@ def calculo_poupanca(num_conta, num_agencia, contas, meses_decorridos): #Funçã
 
     return novo_saldo
 
-def menor_saldo(contas): #Função para encontrar o menor saldo do banco.
-
-    if len(contas) == 0:
-        return False
-    menor_saldo = contas[0]["saldo"]
-    for conta in contas:
-        if conta["saldo"] < menor_saldo:
-            menor_saldo = conta["saldo"]
-
-    return menor_saldo
-
-def maior_saldo(contas): #Função para encontrar o maior saldo do banco.
-
-    if len(contas) == 0:
-        return False
-    maior_saldo = contas[0]["saldo"]
-    for conta in contas:
-        if conta["saldo"] > maior_saldo:
-            maior_saldo = conta["saldo"]
-
-    return maior_saldo

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<section class = "titulo-pagina">
+
+    <h2> Procurar agência </h2>
+
+    <p>
+        Informe o número da agência.
+    </p>
+</section>
+
+<section class = "formulario-container">
+
+    <form method = "post" class = "formulario">
+
+        <div class = "grupo-formulario">
+
+            <label for = "num_agencia">
+                Número da agência
+            </label>
+
+            <input
+                type = "text"
+                id = "num_agencia"
+                name = "num_agencia"
+                required
+            >
+
+        </div>
+
+        <button
+            type = "submit"
+            class = "botao"
+        >
+            Procurar
+        </button>
+
+    </form>
+</section>
+
+{% if mensagem %}
+
+<div class = "mensagem">
+    {{mensagem}}
+</div>
+
+{% endif %}
+
+{% if agencia %}
+
+<section class = "secao-informacoes resultado-cliente">
+
+    <h2> Agência encontrada </h2>
+
+    <p>
+        <strong>Número da agência:</strong>
+        {{agencia.num_agencia}}
+    </p>
+
+    <p>
+        <strong>Nome da agência:</strong>
+        {{agencia.nome_agencia}}
+    </p>
+
+</section>
+
+{% endif %}
+
+{% endblock %}

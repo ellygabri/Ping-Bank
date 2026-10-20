@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from dados import carregar_dados, salvar_dados
 from relatorio import resumo_bancario
 from clientes import cadastrar_cliente, procurar_cliente, listar_clientes, editar_cliente, excluir_cliente
+from agencias import cadastrar_agencia, procurar_agencia, listar_agencias
 
 app = Flask(__name__)
 
@@ -124,3 +125,62 @@ def excluir_cliente_w(cpf):
         mensagem = "Cliente excluído com sucesso."
 
     return redirect(url_for("pagina_clientes", mensagem = mensagem))
+
+#Página para listar agências
+@app.route("/agencias")
+
+def pagina_agencias():
+    clientes, agencias, contas = carregar_dados()
+
+    lista_agencias = listar_agencias(agencias)
+
+    if lista_agencias == False:
+        lista_agencias = []
+    mensagem = request.args.get("mensagem", "")
+
+    return render_template("agencias.html", agencias = lista_agencias, mensagem = mensagem)
+
+#Página para cadastrar agência
+@app.route("/agencias/cadastrar", methods = ["GET", "POST"])
+
+def cadastrar_agencia_w():
+    mensagem = ""
+
+    if request.method == "POST":
+        clientes, agencias, contas = carregar_dados()
+
+        num_agencia = request.form["num_agencia"]
+        nome_agencia = request.form["nome_agencia"]
+
+        resultado = cadastrar_agencia(agencias, num_agencia, nome_agencia)
+
+        if resultado == -1:
+            mensagem = "Existem campos vazios."
+        elif resultado == 0:
+            mensagem = "Agência já cadastrada."
+        elif resultado == 1:
+            salvar_dados(clientes, agencias, contas)
+            return redirect(url_for("pagina_agencias", mensagem = "Agência cadastrada com sucesso."))
+    return render_template("cadastrar_agencia.html", mensagem = mensagem)
+
+#Página para procurar agência
+@app.route("/agencias/procurar", methods = ["GET", "POST"])
+
+def procurar_agencia_w():
+    agencia = None
+    mensagem = ""
+
+    if request.method == "POST":
+        clientes, agencias, contas = carregar_dados()
+
+        num_agencia = request.form["num_agencia"]
+
+        resultado = procurar_agencia(agencias, num_agencia)
+
+        if resultado == False:
+            mensagem = "Agência não encontrada."
+
+        else:
+            agencia = resultado
+
+    return render_template("procurar_agencia.html", agencia = agencia, mensagem = mensagem)

@@ -1,55 +1,46 @@
 # Função para calcular o montante total de uma agência
+from functools import reduce
+
 def montante_agencia(contas, num_agencia):
-    total = 0.0
-    
-    for conta in contas:
-        if conta["num_agencia"] == num_agencia:
-            total += conta["saldo"]
+
+    total = reduce(lambda acumulador, conta: acumulador + conta["saldo"],
+                    (filter(lambda conta: conta["num_agencia"] == num_agencia, contas)), 0.0)
     return total
 
 # Função para calcular o montante total do banco
 def montante_banco(contas):
-    total = 0.0
-
-    for conta in contas:
-        total += conta["saldo"]
+    total = reduce(lambda acumulador, conta: acumulador + conta["saldo"], contas, 0.0)
     return total
 
 # Função para contar quantas contas existem em uma agência
 def quantidade_contas_agencia(contas, num_agencia):
-    quantidade = 0
-
-    for conta in contas:
-        if conta["num_agencia"] == num_agencia:
-            quantidade += 1
+    
+    quantidade = reduce(lambda acumulador, _: acumulador + 1,
+                    (filter(lambda conta: conta["num_agencia"] == num_agencia, contas)), 0)
 
     return quantidade
 
 # Função para calcular o montante de cada tipo de conta
 def montante_tipo_conta(contas, tipo_conta):
-    total = 0.0
 
-    for conta in contas:
-        if conta["tipo_conta"] == tipo_conta:
-            total += conta["saldo"]
+    total = reduce(lambda acumulador, conta: acumulador + conta["saldo"],
+                    (filter(lambda conta: conta["tipo_conta"] == tipo_conta, contas)), 0.0)
+
     return total
 
 # Função para contar quantas contas existem de determinado tipo
 def quantidade_tipo_conta(contas, tipo_conta):
-    quantidade = 0
 
-    for conta in contas:
-        if conta["tipo_conta"] == tipo_conta:
-            quantidade += 1
+    quantidade = reduce(lambda acumulador, _: acumulador + 1,
+                    (filter(lambda conta: conta["tipo_conta"] == tipo_conta, contas)), 0)
     return quantidade
 
 # Função para contar contas individuais e conjuntas
 def quantidade_tipo_titulares(contas, tipo_titulares):
-    quantidade = 0
 
-    for conta in contas:
-        if conta["tipo_titulares"] == tipo_titulares:
-            quantidade += 1
+    quantidade = reduce(lambda acumulador, _: acumulador + 1,
+                    (filter(lambda conta: conta["tipo_titulares"] == tipo_titulares, contas)), 0)
+
     return quantidade
 
 # Função para gerar um resumo geral do banco

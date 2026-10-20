@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<section class = "titulo-pagina">
+
+    <h2> Cadastrar agência </h2>
+
+    <p>
+        Informe os dados da nova agência.
+    </p>
+
+</section>
+
+{% if mensagem %}
+
+<div class = "mensagem">
+    {{mensagem}}
+</div>
+
+{% endif %}
+
+<section class = "formulario-container">
+
+    <form method = "post" class = "formulario">
+
+        <div class = "grupo-formulario">
+
+            <label for = "num_agencia">
+                Número da agência
+            </label>
+
+            <input
+                type = "text"
+                id = "num_agencia"
+                name = "num_agencia"
+                required
+            >
+        </div>
+
+        <div class = "grupo-formulario">
+
+            <label for = "nome_agencia">
+                Nome da agência
+            </label>
+            <input
+                type = "text"
+                id = "nome_agencia"
+                name = "nome_agencia"
+                required
+            >
+        </div>
+
+        <div class = "acoes-formulario">
+
+            <button
+                type = "submit" class = "botao">
+                Cadastrar
+            </button>
+
+            <a
+                href = "{{url_for('pagina_agencias')}}" class = "botao botao-secundario">
+                Voltar
+            </a>
+
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}

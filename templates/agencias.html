@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<section class = "titulo-pagina">
+
+    <h2> Agências </h2>
+
+    <p>
+        Gerenciamento das agências cadastradas no PING BANK
+    </p>
+
+</section>
+
+{% if mensagem %}
+
+<div class = "mensagem">
+    {{mensagem}}
+</div>
+
+{% endif %}
+
+<div class = "acoes-pagina">
+
+    <a href = "{{url_for('cadastrar_agencia_w')}}" class = "botao">
+        Cadastrar agência
+    </a>
+
+    <a href = "{{url_for('procurar_agencia_w')}}" class = "botao botao-secundario">
+        Procurar agência
+    </a>
+
+</div>
+
+<section class = "secao-informacoes">
+
+    <h2> Agências cadastradas </h2>
+
+    {% if agencias %}
+
+    <div class = "tabela-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Número da agência</th>
+                    <th>Nome da agência</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for agencia in agencias %}
+
+                <tr>
+
+                    <td>
+                        {{agencia.num_agencia}}
+                    </td>
+
+                    <td>
+                        {{agencia.nome_agencia}}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% else %}
+
+    <p>
+        Nenhuma agência cadastrada.
+    </p>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

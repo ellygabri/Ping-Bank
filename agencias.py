@@ -33,4 +33,5 @@ def procurar_agencia(agencias, num_agencia):
 def listar_agencias(agencias):
     if len(agencias) == 0:
         return False
-    return agencias
+    agencias_organizadas = sorted(agencias, key = lambda agencia: agencia["nome_agencia"].lower())
+    return agencias_organizadas

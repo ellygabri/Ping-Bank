@@ -6,7 +6,7 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f5f6fa;
+    background-color: #f5f8fc;
     color: #222222;
 }
 .cabecalho {
@@ -16,7 +16,7 @@ body {
 
     padding: 20px 8%;
 
-    background-color: #1f2937;
+    background-color: #092342;
     color: white;
 }
 
@@ -30,7 +30,7 @@ body {
 }
 
 .menu-navegacao a {
-    color: white;
+    color: #E2e8f0;
     text-decoration: none;
 }
 
@@ -119,4 +119,124 @@ th{
     padding: 20px;
     background-color: #1f2937;
     color: white;
+}
+
+.acoes-pagina {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.botao {
+    display: inline-block;
+
+    padding: 10px 16px;
+
+    border: none;
+    border-radius: 6px;
+
+    background-color: #092342;
+    color: white;
+
+    text-decoration: none;
+
+    cursor: pointer;
+}
+
+.botao:hover {
+    opacity: 0.9;
+}
+
+.botao-secundario {
+    background-color: #4b5563;
+}
+
+.botao-perigo {
+    background-color: #991b1b;
+}
+
+.botao-pequeno {
+    padding: 7px 10px;
+
+    font-size: 14px;
+}
+
+.acoes-tabela {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+.acoes-tabela form {
+    margin: 0;
+}
+
+.formulario-container {
+    max-width: 700px;
+}
+
+.formulario {
+    background-color: white;
+
+    padding: 25px;
+
+    border-radius: 8px;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.grupo-formulario {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+
+    margin-bottom: 18px;
+}
+
+.grupo-formulario label {
+    font-weight: bold;
+}
+
+.grupo-formulario input {
+    padding: 10px;
+
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+
+    font-size: 16px;
+}
+
+.acoes-formulario {
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+.mensagem {
+    background-color: white;
+
+    padding: 15px;
+
+    margin-bottom: 20px;
+
+    border-left: 4px solid #092342;
+    border-radius: 5px;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.resultado-cliente {
+    margin-top: 30px;
+}
+
+.resultado-cliente p {
+    margin-bottom: 10px;
+}
+
+.resultado-cliente .botao {
+    margin-top: 15px;
 }

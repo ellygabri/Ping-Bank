@@ -4,7 +4,7 @@
         <meta charset = "UTF-8">
         <meta 
         name = "viewport" 
-        content = "width = device-width, initial-scale = 1.0"
+        content = "width=device-width, initial-scale=1.0"
         >
 
         <title> PING BANK </title>
@@ -19,11 +19,16 @@
 
         <header class = "cabecalho">
             <div class = "logo" >
-                <hi> PING BANK </hi>
+                <h1> PING BANK </h1>
             </div>
 
             <nav class = "menu-navegacao">
-                <a href = "/" >Dashboard </a>
+                <a href = "{{ url_for('dashboard')}}">
+                    Dashboard
+                </a>
+                <a href = "{{ url_for('pagina_clientes')}}">    
+                    Clientes
+                </a>
             </nav>
 
         </header>

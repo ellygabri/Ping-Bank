@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<section class = "titulo-pagina">
+
+    <h2> Clientes </h2>
+    <p>
+        Gerenciamento dos clientes cadastrados no PING BANK
+    </p>
+</section>
+
+{% if mensagem %}
+
+<div class = "mensagem">
+    {{mensagem}}
+</div>
+
+{% endif %}
+
+<div class = "acoes-pagina">
+    <a href = "{{url_for('cadastrar_cliente_w')}}" class = "botao">
+        Cadastrar cliente
+    </a>
+    <a href = "{{url_for('procurar_cliente_w')}}" class = "botao botao-secundario">
+        Procurar cliente
+    </a>
+</div>
+
+<section class = "secao-informacoes">
+    <h2> Clientes cadastrados </h2>
+
+    {% if clientes %}
+
+    <div class = "tabela-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>CPF</th>
+                    <th>Contato</th>
+                    <th>Endereço</th>
+                    <th>Nascimento</th>
+                    <th>E-mail</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cliente in clientes %}
+                <tr>
+                    <td>
+                        {{cliente.nome}}
+                    </td>
+                    <td>
+                        {{cliente.cpf}}
+                    </td>
+                    <td>
+                        {{cliente.contato}}
+                    </td>
+                    <td>
+                        {{cliente.endereco}}
+                    </td>
+                    <td>
+                        {{cliente.data_nascimento}}
+                    </td>
+                    <td>
+                        {{cliente.email}}
+                    </td>
+                    <td>
+                        <div class = "acoes-tabela">
+                            <a href = "{{url_for('editar_cliente_w', cpf = cliente.cpf)}}" class = "botao botao-pequeno">
+                                Editar
+                            </a>
+
+                            <form action = "{{url_for('excluir_cliente_w', cpf = cliente.cpf)}}" method = "post">
+                                <button type = "submit" class = "botao botao-perigo botao-pequeno">
+                                    Excluir
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>
+        Nenhum cliente cadastrado.
+    </p>
+    {% endif %}
+
+</section>
+{% endblock %}

@@ -110,7 +110,8 @@ def procurar_cliente(clientes, cpf):
 def listar_clientes(clientes):
     if len(clientes) == 0:
         return False
-    return clientes
+    clientes_organizados = sorted(clientes, key=lambda cliente: cliente["nome"].lower())
+    return clientes_organizados
 
 # Função para fazer alteração nos dados dos clientes,com exceção do CPF
 def editar_cliente(clientes, cpf, campo, nova_info):
@@ -139,9 +140,14 @@ def excluir_cliente(clientes, contas, cpf):
         return -1
 
     # Verifica se o CPF ainda é titular de alguma conta
-    for conta in contas:
-        if cpf in conta["titulares"]:
-            return 0
+    contas_cliente = [
+        conta
+        for conta in contas
+        if cpf in conta["titulares"]
+    ]
+    if len(contas_cliente) > 0:
+        return 0
+    
     # Exclui o cliente da lista
     del clientes[indice]
     return 1

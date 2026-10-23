@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<section class = "pagina-inicial">
+
+    <div class = "apresentacao-inicial">
+
+        <h2> Bem-vindo ao PING BANK </h2>
+
+        <p>
+            Sistema bancário desenvolvido para gerenciamento de clientes,
+            agências, contas e operações financeiras.
+        </p>
+
+        <p>
+            Utilize as opções abaixo para acessar as funcionalidades do sistema.
+        </p>
+
+    </div>
+
+    <div class = "atalhos-inicio">
+
+        <a href = "{{url_for('pagina_clientes')}}" class = "card-inicio">
+
+            <h3> Clientes </h3>
+
+            <p>
+                Cadastre, consulte e gerencie os clientes do banco.
+            </p>
+        </a>
+
+        <a href = "{{url_for('pagina_agencias')}}" class = "card-inicio">
+
+            <h3> Agências </h3>
+
+            <p>
+                Consulte e gerencie as agências cadastradas.
+            </p>
+        </a>
+
+        <a href = "{{url_for('pagina_contas')}}" class = "card-inicio">
+
+            <h3> Contas </h3>
+
+            <p>
+                Crie contas e gerencie seus titulares.
+            </p>
+        </a>
+
+        <a href = "{{url_for('pagina_operacoes')}}" class = "card-inicio">
+
+            <h3> Operações </h3>
+
+            <p>
+                Realize depósitos, saques, transferências e consultas.
+            </p>
+        </a>
+
+        <a href = "{{url_for('dashboard')}}" class = "card-inicio">
+
+            <h3> Dashboard </h3>
+
+            <p>
+                Visualize os principais indicadores financeiros do banco.
+            </p>
+        </a>
+
+        <a href = "{{url_for('pagina_relatorios')}}" class = "card-inicio">
+
+            <h3> Relatórios </h3>
+
+            <p>
+                Consulte informações e relatórios financeiros.
+            </p>
+        </a>
+
+    </div>
+</section>
+
+{% endblock %}

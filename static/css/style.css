@@ -6,9 +6,10 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f5f8fc;
-    color: #222222;
+    background-color: #f4f8fb;
+    color: #1f2937;
 }
+
 .cabecalho {
     display: flex;
     justify-content: space-between;
@@ -18,10 +19,13 @@ body {
 
     background-color: #092342;
     color: white;
+
+    border-bottom: 4px solid #22a6b3
 }
 
 .logo h1{
     font-size: 24px;
+    letter-spacing: 1px;
 }
 
 .menu-navegacao{
@@ -30,12 +34,16 @@ body {
 }
 
 .menu-navegacao a {
-    color: #E2e8f0;
+    color: #e2e8f0;
     text-decoration: none;
+
+    padding: 8px 10px;
+    border-radius: 5px;
 }
 
 .menu-navegacao a:hover {
-    text-decoration: underline;
+    background-color: #164e63;
+    text-decoration: none;
 }
 
 .conteudo{
@@ -67,6 +75,7 @@ body {
     background-color: white;
     padding: 25px;
     border-radius: 8px;
+    border-top: 4px solid #22a6b3;
     min-width: 200px;
     flex: 1;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -75,7 +84,7 @@ body {
 .card h3{
     font-size: 16px;
     margin-bottom: 15px;
-    color: #555555;
+    color: #164e63;
 }
 
 .valor-card {
@@ -158,14 +167,12 @@ th{
 
 .botao-pequeno {
     padding: 7px 10px;
-
     font-size: 14px;
 }
 
 .acoes-tabela {
     display: flex;
     align-items: center;
-
     gap: 8px;
 }
 
@@ -200,13 +207,20 @@ th{
     font-weight: bold;
 }
 
-.grupo-formulario input {
+.grupo-formulario input,
+.grupo-formulario select,
+.grupo-formulario textarea {
     padding: 10px;
 
     border: 1px solid #cccccc;
     border-radius: 5px;
 
     font-size: 16px;
+}
+
+.grupo-formulario textarea {
+    min-height: 100px;
+    resize: vertical;
 }
 
 .acoes-formulario {
@@ -240,4 +254,60 @@ th{
 
 .resultado-cliente .botao {
     margin-top: 15px;
+}
+
+.pagina-inicial {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.apresentacao-inicial {
+    text-align: center;
+    padding: 30px;
+}
+
+.apresentacao-inicial h2 {
+    margin-bottom: 15px;
+}
+
+.apresentacao-inicial p {
+    margin-bottom: 10px;
+}
+
+.atalhos-inicio {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.card-inicio {
+    flex: 1 1 250px;
+
+    padding: 25px;
+
+    border: 1px solid #dbe5ec;
+    border-left: 5px solid #22a6b3;
+    border-radius: 8px;
+
+    background-color: white;
+
+    text-decoration: none;
+    color: #1f2937;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.card-inicio h3 {
+    margin-bottom: 10px;
+    color: #092342;
+}
+
+.card-inicio p {
+    color: #64748b;
+}
+
+.card-inicio:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.10);
 }

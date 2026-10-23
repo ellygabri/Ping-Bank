@@ -79,6 +79,13 @@ def listar_contas(contas):
         return False
     return contas
 
+def listar_contas_saldo_positivo(contas):
+    contas_positivas = [conta for conta in contas if conta["saldo"]>0]
+
+    if len(contas_positivas) == 0:
+        return False
+    return contas_positivas
+
 def deposito(contas, num_conta, num_agencia, cpf, valor_deposito): #Aumenta o saldo da conta com o valor do depósito.
 
     indice = verificador_existencia(contas, num_conta, num_agencia)

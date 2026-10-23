@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<section class = "titulo-pagina">
+
+    <h2> Criar conta </h2>
+
+    <p>
+        Informe os dados da nova conta.
+    </p>
+</section>
+
+{% if mensagem %}
+
+<div class = "mensagem">
+    {{mensagem}}
+</div>
+
+{% endif %}
+
+<section class = "formulario-container">
+
+    <form method = "post" class = "formulario">
+
+        <div class = "grupo-formulario">
+
+            <label for = "num_agencia">
+                Número da agência
+            </label>
+
+            <input
+                type = "text"
+                id = "num_agencia"
+                name = "num_agencia"
+                required
+            >
+        </div>
+
+        <div class = "grupo-formulario">
+
+            <label for = "tipo_titulares">
+                Tipo de titularidade
+            </label>
+
+            <select
+                id = "tipo_titulares"
+                name = "tipo_titulares"
+                required
+            >
+
+                <option value = "1">
+                    Individual
+                </option>
+
+                <option value = "2">
+                    Conjunta
+                </option>
+            </select>
+        </div>
+
+        <div class = "grupo-formulario">
+
+            <label for = "titulares">
+                CPF dos titulares
+            </label>
+
+            <textarea
+                id = "titulares"
+                name = "titulares"
+                placeholder = "Separe os CPFs por vírgula"
+                required
+            ></textarea>
+        </div>
+
+        <div class = "grupo-formulario">
+
+            <label for = "saldo">
+                Saldo inicial
+            </label>
+
+            <input
+                type = "number"
+                id = "saldo"
+                name = "saldo"
+                step = "0.01"
+                required
+            >
+        </div>
+
+        <div class = "grupo-formulario">
+
+            <label for = "tipo_conta">
+                Tipo da conta
+            </label>
+
+            <select
+                id = "tipo_conta"
+                name = "tipo_conta"
+                required
+            >
+                <option value = "1">
+                    Corrente
+                </option>
+
+                <option value = "2">
+                    Poupança
+                </option>
+
+                <option value = "3">
+                    Salário
+                </option>
+            </select>
+        </div>
+
+        <div class = "acoes-formulario">
+
+            <button type = "submit" class = "botao">
+                Criar conta
+            </button>
+
+            <a href = "{{url_for('pagina_contas')}}" class = "botao botao-secundario">
+                Voltar
+            </a>
+        </div>
+    </form>
+</section>
+
+{% endblock %}

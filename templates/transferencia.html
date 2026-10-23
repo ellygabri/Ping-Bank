@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<section class = "titulo-pagina">
+
+    <h2> Transferência </h2>
+
+    <p>
+        Transfira um valor entre duas contas do PING BANK.
+    </p>
+</section>
+
+{% if mensagem %}
+
+<div class = "mensagem">
+    {{mensagem}}
+</div>
+
+{% endif %}
+
+<section class = "formulario-container">
+
+    <form method = "post" class = "formulario">
+
+        <div class = "grupo-formulario">
+
+            <label for = "conta_origem">
+                Conta de origem
+            </label>
+
+            <input type = "number" id = "conta_origem" name = "conta_origem" required>
+        </div>
+
+        <div class = "grupo-formulario">
+
+            <label for = "agencia_origem">
+                Agência de origem
+            </label>
+
+            <input type = "text" id = "agencia_origem" name = "agencia_origem" required>
+        </div>
+
+        <div class = "grupo-formulario">
+
+            <label for = "cpf">
+                CPF de um titular da conta de origem
+            </label>
+
+            <input type = "text" id = "cpf" name = "cpf" required>
+        </div>
+
+        <div class = "grupo-formulario">
+
+            <label for = "conta_destino">
+                Conta de destino
+            </label>
+
+            <input type = "number" id = "conta_destino" name = "conta_destino" required>
+        </div>
+
+        <div class = "grupo-formulario">
+
+            <label for = "agencia_destino">
+                Agência de destino
+            </label>
+
+            <input type = "text" id = "agencia_destino" name = "agencia_destino" required>
+        </div>
+
+        <div class = "grupo-formulario">
+
+            <label for = "valor">
+                Valor da transferência
+            </label>
+
+            <input
+                type = "number"
+                id = "valor"
+                name = "valor"
+                step = "0.01"
+                required
+            >
+        </div>
+
+        <div class = "acoes-formulario">
+
+            <button type = "submit" class = "botao">
+                Transferir
+            </button>
+
+            <a href = "{{url_for('pagina_operacoes')}}" class = "botao botao-secundario">
+                Voltar
+            </a>
+        </div>
+    </form>
+</section>
+
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<section class = "titulo-pagina">
+
+    <h2> Contas </h2>
+
+    <p>
+        Gerenciamento das contas cadastradas no PING BANK
+    </p>
+
+</section>
+
+{% if mensagem %}
+
+<div class = "mensagem">
+    {{mensagem}}
+</div>
+
+{% endif %}
+
+<div class = "acoes-pagina">
+
+    <a href = "{{url_for('cadastrar_conta_w')}}" class = "botao">
+        Criar conta
+    </a>
+
+    <a href = "{{url_for('procurar_conta_w')}}" class = "botao botao-secundario">
+        Procurar conta
+    </a>
+
+    <a href = "{{url_for('contas_cliente_w')}}" class = "botao botao-secundario">
+        Contas de cliente
+    </a>
+
+    <a href = "{{url_for('contas_positivas_w')}}" class = "botao botao-secundario">
+        Contas com saldo positivo
+    </a>
+</div>
+
+<div class = "acoes-pagina">
+
+    <a href = "{{url_for('titulares_conta_w')}}" class = "botao botao-secundario">
+        Titulares
+    </a>
+
+    <a href = "{{url_for('adicionar_titular_w')}}" class = "botao botao-secundario">
+        Adicionar titular
+    </a>
+
+    <a href = "{{url_for('remover_titular_w')}}" class = "botao botao-secundario">
+        Remover titular
+    </a>
+
+    <a href = "{{url_for('substituir_titular_w')}}" class = "botao botao-secundario">
+        Substituir titular
+    </a>
+
+    <a href = "{{url_for('excluir_conta_w')}}" class = "botao botao-perigo">
+        Excluir conta
+    </a>
+</div>
+
+<section class = "secao-informacoes">
+
+    <h2> Contas cadastradas </h2>
+
+    {% if contas %}
+
+    <div class = "tabela-container">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Conta</th>
+                    <th>Agência</th>
+                    <th>Tipo</th>
+                    <th>Titularidade</th>
+                    <th>Saldo</th>
+                    <th>Titulares</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for conta in contas %}
+
+                <tr>
+
+                    <td>
+                        {{conta.num_conta}}
+                    </td>
+
+                    <td>
+                        {{conta.num_agencia}}
+                    </td>
+
+                    <td>
+
+                        {% if conta.tipo_conta == 1 %}
+                            Corrente
+                        {% elif conta.tipo_conta == 2 %}
+                            Poupança
+                        {% elif conta.tipo_conta == 3 %}
+                            Salário
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {% if conta.tipo_titulares == 1 %}
+                            Individual
+                        {% elif conta.tipo_titulares == 2 %}
+                            Conjunta
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        R$ {{conta.saldo}}
+                    </td>
+
+                    <td>
+                        {{conta.titulares | join(", ")}}
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+
+    <p>
+        Nenhuma conta cadastrada.
+    </p>
+
+    {% endif %}
+</section>
+
+{% endblock %}

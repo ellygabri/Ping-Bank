@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<section class = "titulo-pagina">
+
+    <h2> Rendimento da poupança </h2>
+
+    <p>
+        Aplique o rendimento da poupança de acordo com os meses decorridos.
+    </p>
+
+</section>
+
+{% if mensagem %}
+
+<div class = "mensagem">
+    {{mensagem}}
+</div>
+
+{% endif %}
+
+<section class = "formulario-container">
+
+    <form method = "post" class = "formulario">
+
+        <div class = "grupo-formulario">
+
+            <label for = "num_conta">
+                Número da conta
+            </label>
+
+            <input type = "number" id = "num_conta" name = "num_conta" required>
+        </div>
+
+        <div class = "grupo-formulario">
+
+            <label for = "num_agencia">
+                Número da agência
+            </label>
+
+            <input type = "text" id = "num_agencia" name = "num_agencia" required>
+        </div>
+
+        <div class = "grupo-formulario">
+
+            <label for = "meses_decorridos">
+                Meses decorridos
+            </label>
+
+            <input
+                type = "number"
+                id = "meses_decorridos"
+                name = "meses_decorridos"
+                required
+            >
+        </div>
+
+        <div class = "acoes-formulario">
+
+            <button type = "submit" class = "botao">
+                Aplicar rendimento
+            </button>
+
+            <a href = "{{url_for('pagina_operacoes')}}" class = "botao botao-secundario">
+                Voltar
+            </a>
+
+        </div>
+    </form>
+</section>
+
+{% if novo_saldo is not none %}
+
+<section class = "secao-informacoes resultado-cliente">
+
+    <h2> Novo saldo </h2>
+
+    <p class = "valor-card">
+        R$ {{novo_saldo}}
+    </p>
+</section>
+
+{% endif %}
+
+{% endblock %}

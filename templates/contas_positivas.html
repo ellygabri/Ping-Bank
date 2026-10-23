@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<section class = "titulo-pagina">
+
+    <h2> Contas com saldo positivo </h2>
+
+    <p>
+        Lista de contas do PING BANK que possuem saldo maior que zero.
+    </p>
+</section>
+
+<section class = "secao-informacoes">
+
+    {% if contas %}
+
+    <div class = "tabela-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Conta</th>
+                    <th>Agência</th>
+                    <th>Tipo</th>
+                    <th>Saldo</th>
+                    <th>Titulares</th>
+                </tr>
+
+            </thead>
+            <tbody>
+
+                {% for conta in contas %}
+
+                <tr>
+
+                    <td>
+                        {{conta.num_conta}}
+                    </td>
+
+                    <td>
+                        {{conta.num_agencia}}
+                    </td>
+
+                    <td>
+
+                        {% if conta.tipo_conta == 1 %}
+                            Corrente
+                        {% elif conta.tipo_conta == 2 %}
+                            Poupança
+                        {% elif conta.tipo_conta == 3 %}
+                            Salário
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        R$ {{conta.saldo}}
+                    </td>
+
+                    <td>
+                        {{conta.titulares | join(", ")}}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+
+    <p>
+        Nenhuma conta possui saldo positivo.
+    </p>
+
+    {% endif %}
+
+    <div class = "acoes-formulario">
+
+        <a href = "{{url_for('pagina_contas')}}" class = "botao botao-secundario">
+            Voltar
+        </a>
+    </div>
+</section>
+
+{% endblock %}

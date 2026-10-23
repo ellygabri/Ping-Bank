@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<section class = "titulo-pagina">
+
+    <h2> Contas de um cliente </h2>
+
+    <p>
+        Informe o CPF para listar as contas associadas ao cliente.
+    </p>
+</section>
+
+{% if mensagem %}
+
+<div class = "mensagem">
+    {{mensagem}}
+</div>
+
+{% endif %}
+
+<section class = "formulario-container">
+
+    <form method = "post" class = "formulario">
+
+        <div class = "grupo-formulario">
+
+            <label for = "cpf">
+                CPF do cliente
+            </label>
+
+            <input
+                type = "text"
+                id = "cpf"
+                name = "cpf"
+                required
+            >
+        </div>
+
+        <div class = "acoes-formulario">
+
+            <button type = "submit" class = "botao">
+                Listar contas
+            </button>
+
+            <a href = "{{url_for('pagina_contas')}}" class = "botao botao-secundario">
+                Voltar
+            </a>
+        </div>
+    </form>
+</section>
+
+{% if contas %}
+
+<section class = "secao-informacoes resultado-cliente">
+
+    <h2> Contas encontradas </h2>
+
+    <div class = "tabela-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Conta</th>
+                    <th>Agência</th>
+                    <th>Tipo</th>
+                    <th>Saldo</th>
+                    <th>Titulares</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for conta in contas %}
+
+                <tr>
+
+                    <td>
+                        {{conta.num_conta}}
+                    </td>
+
+                    <td>
+                        {{conta.num_agencia}}
+                    </td>
+
+                    <td>
+
+                        {% if conta.tipo_conta == 1 %}
+                            Corrente
+                        {% elif conta.tipo_conta == 2 %}
+                            Poupança
+                        {% elif conta.tipo_conta == 3 %}
+                            Salário
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        R$ {{conta.saldo}}
+                    </td>
+
+                    <td>
+                        {{conta.titulares | join(", ")}}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endif %}
+
+{% endblock %}

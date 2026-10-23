@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<section class = "titulo-pagina">
+
+    <h2> Titulares da conta </h2>
+
+    <p>
+        Informe a conta e a agência para consultar seus titulares.
+    </p>
+</section>
+
+{% if mensagem %}
+
+<div class = "mensagem">
+    {{mensagem}}
+</div>
+
+{% endif %}
+
+<section class = "formulario-container">
+
+    <form method = "post" class = "formulario">
+
+        <div class = "grupo-formulario">
+
+            <label for = "num_conta">
+                Número da conta
+            </label>
+
+            <input
+                type = "number"
+                id = "num_conta"
+                name = "num_conta"
+                required
+            >
+
+        </div>
+
+        <div class = "grupo-formulario">
+
+            <label for = "num_agencia">
+                Número da agência
+            </label>
+
+            <input
+                type = "text"
+                id = "num_agencia"
+                name = "num_agencia"
+                required
+            >
+
+        </div>
+
+        <div class = "acoes-formulario">
+
+            <button type = "submit" class = "botao">
+                Listar titulares
+            </button>
+
+            <a href = "{{url_for('pagina_contas')}}" class = "botao botao-secundario">
+                Voltar
+            </a>
+
+        </div>
+    </form>
+</section>
+
+{% if titulares %}
+
+<section class = "secao-informacoes resultado-cliente">
+
+    <h2> Titulares encontrados </h2>
+
+    {% for cpf in titulares %}
+
+    <p>
+        {{cpf}}
+    </p>
+
+    {% endfor %}
+</section>
+
+{% endif %}
+
+{% endblock %}

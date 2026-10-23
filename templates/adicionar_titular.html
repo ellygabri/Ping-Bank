@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<section class = "titulo-pagina">
+
+    <h2> Adicionar titular </h2>
+
+    <p>
+        Adicione um novo titular a uma conta existente.
+    </p>
+</section>
+
+{% if mensagem %}
+
+<div class = "mensagem">
+    {{mensagem}}
+</div>
+
+{% endif %}
+
+<section class = "formulario-container">
+
+    <form method = "post" class = "formulario">
+
+        <div class = "grupo-formulario">
+
+            <label for = "num_conta">
+                Número da conta
+            </label>
+
+            <input
+                type = "number"
+                id = "num_conta"
+                name = "num_conta"
+                required
+            >
+        </div>
+
+        <div class = "grupo-formulario">
+
+            <label for = "num_agencia">
+                Número da agência
+            </label>
+
+            <input
+                type = "text"
+                id = "num_agencia"
+                name = "num_agencia"
+                required
+            >
+        </div>
+
+        <div class = "grupo-formulario">
+
+            <label for = "cpf_validacao">
+                CPF de um titular atual
+            </label>
+
+            <input
+                type = "text"
+                id = "cpf_validacao"
+                name = "cpf_validacao"
+                required
+            >
+        </div>
+
+        <div class = "grupo-formulario">
+
+            <label for = "novo_titular">
+                CPF do novo titular
+            </label>
+
+            <input
+                type = "text"
+                id = "novo_titular"
+                name = "novo_titular"
+                required
+            >
+        </div>
+
+        <div class = "acoes-formulario">
+
+            <button type = "submit" class = "botao">
+                Adicionar
+            </button>
+
+            <a href = "{{url_for('pagina_contas')}}" class = "botao botao-secundario">
+                Voltar
+            </a>
+        </div>
+    </form>
+</section>
+
+{% endblock %}

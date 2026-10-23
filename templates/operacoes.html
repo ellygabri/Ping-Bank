@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<section class = "titulo-pagina">
+
+    <h2> Operações bancárias </h2>
+
+    <p>
+        Realize operações nas contas do PING BANK.
+    </p>
+</section>
+
+<div class = "acoes-pagina">
+
+    <a href = "{{url_for('consultar_saldo_w')}}" class = "botao">
+        Consultar saldo
+    </a>
+
+    <a href = "{{url_for('deposito_w')}}" class = "botao">
+        Depositar
+    </a>
+
+    <a href = "{{url_for('saque_w')}}" class = "botao">
+        Sacar
+    </a>
+
+    <a href = "{{url_for('transferencia_w')}}" class = "botao">
+        Transferir
+    </a>
+
+    <a href = "{{url_for('poupanca_w')}}" class = "botao">
+        Rendimento da poupança
+    </a>
+</div>
+
+{% endblock %}

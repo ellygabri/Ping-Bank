@@ -32,6 +32,13 @@
                 <a href = "{{url_for('pagina_agencias')}}">
                     Agências
                 </a>
+
+                 <a href = "{{ url_for('pagina_contas')}}"> 
+                    Contas
+                </a>
+                 <a href = "{{ url_for('pagina_operacoes')}}">
+                    Operações 
+                </a>
             </nav>
 
         </header>
@@ -48,18 +55,3 @@
     </body>
 
 </html>
-
-<nav class = "menu-navegacao">
-
-    <a href = "{{ url_for('dashboard')}}">
-        Dashboard
-    </a>
-
-    <a href = "{{ url_for('pagina_clientes')}}">
-        Clientes
-    </a>
-
-    <a href = "{{ url_for('pagina_agencias')}}">
-        Agências
-    </a>
-</nav>

@@ -45,6 +45,10 @@ def quantidade_tipo_titulares(contas, tipo_titulares):
 
 # Função para gerar um resumo geral do banco
 def resumo_bancario(clientes, agencias, contas):
+
+    conta_menor_saldo = menor_saldo(contas)
+    conta_maior_saldo = maior_saldo(contas)
+
     resumo = {
         "quantidade_clientes": len(clientes),
         "quantidade_agencias": len(agencias),
@@ -61,8 +65,17 @@ def resumo_bancario(clientes, agencias, contas):
         "montante_salario": montante_tipo_conta(contas, 3),
 
         "quantidade_individuais": quantidade_tipo_titulares(contas, 1),
-        "quantidade_conjuntas": quantidade_tipo_titulares(contas, 2)
+        "quantidade_conjuntas": quantidade_tipo_titulares(contas, 2),
+
+        "menor_saldo": 0.0,
+        "maior_saldo": 0.0,
+        "saldo_medio": saldo_medio(contas)
     }
+
+    if conta_menor_saldo != False:
+        resumo["menor_saldo"] = conta_menor_saldo["saldo"]
+    if conta_maior_saldo != False:
+        resumo["maior_saldo"] = conta_maior_saldo["saldo"]
     return resumo
 
 #Função para encontrar o menor saldo do banco.
@@ -70,11 +83,7 @@ def menor_saldo(contas):
 
     if len(contas) == 0:
         return False
-    menor_saldo = contas[0]["saldo"]
-    for conta in contas:
-        if conta["saldo"] < menor_saldo:
-            conta_menor_saldo = conta
-
+    conta_menor_saldo = min(contas, key = lambda conta: conta["saldo"])
     return conta_menor_saldo
 
 #Função para encontrar o maior saldo do banco.
@@ -82,9 +91,14 @@ def maior_saldo(contas):
 
     if len(contas) == 0:
         return False
-    maior_saldo = contas[0]["saldo"]
-    for conta in contas:
-        if conta["saldo"] > maior_saldo:
-            conta_maior_saldo = conta
-
+    conta_maior_saldo = max(contas, key = lambda conta: conta["saldo"])
     return conta_maior_saldo
+
+#Função para calcular o saldo médio das contas do banco
+def saldo_medio(contas):
+
+    if len(contas) == 0:
+        return 0.0
+    
+    media = montante_banco(contas)/len(contas)
+    return media

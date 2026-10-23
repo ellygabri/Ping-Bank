@@ -1,0 +1,1 @@
+Flask #necessário para rodar a aplicação web

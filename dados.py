@@ -19,6 +19,6 @@ def salvar_dados(clientes,agencias,contas):
     dados = {"clientes": clientes, "agencias": agencias, "contas": contas}
     arquivo = open("ping_bank_dados.json", "w", encoding = "utf-8")
 
-    json.dump(dados,arquivo, ensure_ascci = False, indent = 4)
+    json.dump(dados,arquivo, ensure_ascii = False, indent = 4)
 
     arquivo.close()

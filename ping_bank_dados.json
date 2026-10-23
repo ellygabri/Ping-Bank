@@ -1,5 +1,14 @@
 {
-    "clientes": [],
+    "clientes": [
+        {
+            "nome": "João Victor",
+            "cpf": "04190910503",
+            "contato": "(79)996777736",
+            "endereco": "Av.farolandia, 112, casa E",
+            "data_nascimento": "19/04/2003",
+            "email": "v.jps@dcomp.ufs.br"
+        }
+    ],
     "agencias": [],
     "contas": []
 }

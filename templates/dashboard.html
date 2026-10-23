@@ -2,11 +2,13 @@
 
 {% block conteudo %}
 
-<section class = "titulo-pagina" >
+<section class = "titulo-pagina">
 
     <h2> Dashboard Financeiro </h2>
 
-    <p> Visão geral das informações financeiras do PING BANK </p>
+    <p>
+        Visão geral das informações financeiras do PING BANK
+    </p>
 
 </section>
 
@@ -15,13 +17,14 @@
     <div class = "card">
 
         <h3> Clientes </h3>
-        <p class = "valor-card" >
+
+        <p class = "valor-card">
             {{resumo.quantidade_clientes}}
         </p>
 
     </div>
 
-    <div class = "card" >
+    <div class = "card">
 
         <h3> Agências </h3>
 
@@ -31,24 +34,52 @@
 
     </div>
 
-    <div class = "card" >
+    <div class = "card">
 
         <h3> Contas </h3>
-        <p class = "valor-card" >
+
+        <p class = "valor-card">
             {{resumo.quantidade_contas}}
         </p>
-
+        
     </div>
 
-    <div class = "card" >
+    <div class = "card">
 
         <h3> Saldo total </h3>
-        <p class = "valor-card" >
+
+        <p class = "valor-card">
             R$ {{resumo.montante_total}}
         </p>
 
     </div>
 
+    <div class = "card">
+
+        <h3> Maior saldo </h3>
+
+        <p class = "valor-card">
+            R$ {{resumo.maior_saldo}}
+        </p>
+    </div>
+
+    <div class = "card">
+
+        <h3> Menor saldo </h3>
+
+        <p class = "valor-card">
+            R$ {{resumo.menor_saldo}}
+        </p>
+    </div>
+
+    <div class = "card">
+
+        <h3> Saldo médio </h3>
+
+        <p class = "valor-card">
+            R$ {{resumo.saldo_medio}}
+        </p>
+    </div>
 </section>
 
 <section class = "secao-informacoes">
@@ -90,11 +121,42 @@
                 </tr>
 
             </tbody>
+        </table>
+    </div>
+</section>
 
+<section class = "secao-informacoes">
+
+    <h2> Contas por titularidade </h2>
+
+    <div class = "tabela-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th> Titularidade </th>
+                    <th> Quantidade </th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td> Individual </td>
+                    <td> {{resumo.quantidade_individuais}} </td>
+                </tr>
+
+                <tr>
+                    <td> Conjunta </td>
+                    <td> {{resumo.quantidade_conjuntas}} </td>
+                </tr>
+            </tbody>
         </table>
 
     </div>
-
+    
 </section>
 
 {% endblock %}

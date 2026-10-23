@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<section class = "titulo-pagina">
+
+    <h2> Relatórios </h2>
+
+    <p>
+        Consulte informações gerais e financeiras do PING BANK.
+    </p>
+</section>
+
+<div class = "acoes-pagina">
+
+    <a href = "{{url_for('relatorio_banco_w')}}" class = "botao">
+        Relatório geral do banco
+    </a>
+
+    <a href = "{{url_for('relatorio_agencia_w')}}" class = "botao botao-secundario">
+        Relatório por agência
+    </a>
+</div>
+
+{% endblock %}

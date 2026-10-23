@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<section class = "titulo-pagina">
+
+    <h2> Relatório por agência </h2>
+
+    <p>
+        Informe o número da agência para consultar suas informações.
+    </p>
+</section>
+
+{% if mensagem %}
+
+<div class = "mensagem">
+    {{mensagem}}
+</div>
+
+{% endif %}
+
+<section class = "formulario-container">
+
+    <form method = "post" class = "formulario">
+
+        <div class = "grupo-formulario">
+
+            <label for = "num_agencia">
+                Número da agência
+            </label>
+
+            <input
+                type = "text"
+                id = "num_agencia"
+                name = "num_agencia"
+                required
+            >
+
+        </div>
+
+        <div class = "acoes-formulario">
+
+            <button type = "submit" class = "botao">
+                Gerar relatório
+            </button>
+
+            <a href = "{{url_for('pagina_relatorios')}}" class = "botao botao-secundario">
+                Voltar
+            </a>
+
+        </div>
+
+    </form>
+</section>
+
+{% if agencia %}
+
+<section class = "secao-informacoes resultado-cliente">
+
+    <h2> Informações da agência </h2>
+
+    <p>
+        <strong>Número:</strong>
+        {{agencia.num_agencia}}
+    </p>
+
+    <p>
+        <strong>Nome:</strong>
+        {{agencia.nome_agencia}}
+    </p>
+
+    <p>
+        <strong>Quantidade de contas:</strong>
+        {{quantidade_contas}}
+    </p>
+
+    <p>
+        <strong>Montante total:</strong>
+        R$ {{montante}}
+    </p>
+</section>
+
+{% endif %}
+
+{% endblock %}

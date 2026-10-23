@@ -1,14 +1,21 @@
 from flask import Flask, render_template, request, redirect, url_for
 from dados import carregar_dados, salvar_dados
-from relatorio import resumo_bancario
+from relatorio import resumo_bancario, montante_agencia, quantidade_contas_agencia
 from clientes import cadastrar_cliente, procurar_cliente, listar_clientes, editar_cliente, excluir_cliente
 from agencias import cadastrar_agencia, procurar_agencia, listar_agencias
 from contas import criar_conta, procurar_conta, listar_contas, listar_contas_saldo_positivo, listar_contas_clientes, listar_titulares, adicionar_titular, remover_titular, substituir_titular, excluir_conta, consultar_saldo, deposito, saque, transferencia, calculo_poupanca 
 
 app = Flask(__name__)
 
-#Página inicial do Dashboard
+#Página inicial
 @app.route("/")
+
+def inicio():
+
+    return render_template("inicio.html")
+
+#Página do Dashboard
+@app.route("/dashboard")
 
 def dashboard():
     clientes, agencias, contas = carregar_dados()
@@ -218,7 +225,7 @@ def cadastrar_conta_w():
 
         titulares = [cpf.strip() for cpf in titulares_texto.split(",") if cpf.strip() != ""]
 
-        resultado = criar_conta(contas,clientes,num_agencia,tipo_titulares, saldo, titulares, tipo_conta)
+        resultado = criar_conta(contas, clientes, agencias, num_agencia, tipo_titulares, saldo, titulares, tipo_conta)
 
         if resultado == -1:
             mensagem = "Agência não encontrada."
@@ -231,7 +238,7 @@ def cadastrar_conta_w():
         elif resultado == -5:
             mensagem = "Um dos titulares não está cadastrado."
         elif resultado == -6:
-            mensegem = "Tipo de conta inválido."
+            mensagem = "Tipo de conta inválido."
         elif resultado == -7:
             mensagem = "Existem titulares repetidos."
         else:
@@ -593,3 +600,46 @@ def poupanca_w():
             novo_saldo = resultado
             mensagem = "Rendimento aplicado com sucesso."
     return render_template("poupanca.html", mensagem = mensagem, novo_saldo = novo_saldo)
+
+#Página principal dos relatórios
+@app.route("/relatorios")
+
+def pagina_relatorios():
+    return render_template("relatorios.html")
+
+#Página para exibir o relatório geral do banco
+@app.route("/relatorios/banco")
+
+def relatorio_banco_w():
+    clientes, agencias, contas = carregar_dados()
+
+    resumo = resumo_bancario(clientes, agencias, contas)
+
+    return render_template("relatorio_banco.html", resumo = resumo)
+
+#Página para exibir relatório de uma agência
+@app.route("/relatorios/agencia", methods = ["GET", "POST"])
+
+def relatorio_agencia_w():
+    agencia = None
+    quantidade_contas = None
+    montante = None
+    mensagem = ""
+
+    if request.method == "POST":
+        clientes, agencias, contas = carregar_dados()
+
+        num_agencia = request.form["num_agencia"]
+
+        agencia_encontrada = procurar_agencia(agencias, num_agencia)
+
+        if agencia_encontrada == False:
+            mensagem = "Agência não encontrada."
+
+        else:
+            agencia = agencia_encontrada
+
+            quantidade_contas = quantidade_contas_agencia(contas, num_agencia)
+
+            montante = montante_agencia(contas, num_agencia)
+    return render_template("relatorio_agencia.html", agencia = agencia, quantidade_contas = quantidade_contas, montante = montante, mensagem = mensagem)

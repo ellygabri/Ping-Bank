@@ -7,6 +7,86 @@
             "endereco": "Av.farolandia, 112, casa E",
             "data_nascimento": "19/04/2003",
             "email": "v.jps@dcomp.ufs.br"
+        },
+        {
+            "nome": "Ana Beatriz Souza",
+            "cpf": "10433218100",
+            "contato": "(79) 99100-0001",
+            "endereco": "Rua das Palmeiras, 120, Centro, Aracaju/SE, CEP 49010-000",
+            "data_nascimento": "14/03/1992",
+            "email": "ana.souza@example.com"
+        },
+        {
+            "nome": "Carlos Eduardo Lima",
+            "cpf": "96001338914",
+            "contato": "(79) 99100-0002",
+            "endereco": "Av. Beira Mar, 455, Atalaia, Aracaju/SE, CEP 49037-000",
+            "data_nascimento": "22/07/1988",
+            "email": "carlos.lima@example.com"
+        },
+        {
+            "nome": "Mariana Alves Costa",
+            "cpf": "08386379499",
+            "contato": "(79) 99100-0003",
+            "endereco": "Rua do Sol, 78, Jardins, Aracaju/SE, CEP 49025-000",
+            "data_nascimento": "05/11/1995",
+            "email": "mariana.costa@example.com"
+        },
+        {
+            "nome": "João Pedro Santos",
+            "cpf": "02654235114",
+            "contato": "(79) 99100-0004",
+            "endereco": "Rua Bahia, 310, São José, Aracaju/SE, CEP 49015-000",
+            "data_nascimento": "30/01/1985",
+            "email": "joao.santos@example.com"
+        },
+        {
+            "nome": "Fernanda Oliveira Rocha",
+            "cpf": "16155940789",
+            "contato": "(79) 99100-0005",
+            "endereco": "Av. Hermes Fontes, 900, Salgado Filho, Aracaju/SE, CEP 49020-000",
+            "data_nascimento": "18/09/1990",
+            "email": "fernanda.rocha@example.com"
+        },
+        {
+            "nome": "Rafael Menezes Barros",
+            "cpf": "81618495950",
+            "contato": "(79) 99100-0006",
+            "endereco": "Rua Sergipe, 66, Siqueira Campos, Aracaju/SE, CEP 49075-000",
+            "data_nascimento": "09/06/1983",
+            "email": "rafael.barros@example.com"
+        },
+        {
+            "nome": "Juliana Ferreira Dias",
+            "cpf": "31034131656",
+            "contato": "(79) 99100-0007",
+            "endereco": "Rua Pernambuco, 215, Getúlio Vargas, Aracaju/SE, CEP 49055-000",
+            "data_nascimento": "27/12/1998",
+            "email": "juliana.dias@example.com"
+        },
+        {
+            "nome": "Lucas Gabriel Martins",
+            "cpf": "47525534144",
+            "contato": "(79) 99100-0008",
+            "endereco": "Av. Rio Branco, 1500, Centro, Aracaju/SE, CEP 49010-001",
+            "data_nascimento": "12/04/2000",
+            "email": "lucas.martins@example.com"
+        },
+        {
+            "nome": "Camila Ribeiro Nunes",
+            "cpf": "92832764851",
+            "contato": "(79) 99100-0009",
+            "endereco": "Rua Lagarto, 42, Santo Antônio, Aracaju/SE, CEP 49060-000",
+            "data_nascimento": "03/08/1993",
+            "email": "camila.nunes@example.com"
+        },
+        {
+            "nome": "Pedro Henrique Araújo",
+            "cpf": "35030564160",
+            "contato": "(79) 99100-0010",
+            "endereco": "Rua Itabaiana, 188, Centro, Aracaju/SE, CEP 49010-002",
+            "data_nascimento": "25/02/1979",
+            "email": "pedro.araujo@example.com"
         }
     ],
     "agencias": [],

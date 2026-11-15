@@ -14,14 +14,21 @@ class Conta:
     @property
     def saldo(self):
         return self.__saldo  
-    def depositar(self, valor):
-        if valor <= 0:
-            raise ValueError("Valor inválido.")
-        self.saldo += valor
-    def sacar(self, valor):
+    def validacao_valor(self, valor, validar_saida= True):
         if valor <= 0:
             raise ValueError("Valor inválido.") 
-        elif valor > self.saldo:
+        elif validar_saida and valor > self.saldo:
             raise ValueError("Saldo insuficiente.")
-        self.saldo -= valor
-    
+    def depositar(self, valor):
+        self.validacao_valor(valor, False)
+        self.__saldo += valor
+    def sacar(self, valor):
+        self.validacao_valor(valor)
+        self.__saldo -= valor
+    def transferencia(self, valor, conta_destino):
+        self.validacao_valor(valor)
+        self.sacar(valor)
+        conta_destino.depositar(valor)
+
+        
+

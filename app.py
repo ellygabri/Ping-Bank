@@ -3,7 +3,7 @@ from dados import carregar_dados, salvar_dados
 from relatorio import resumo_bancario, montante_agencia, quantidade_contas_agencia
 from clientes import cadastrar_cliente, procurar_cliente, listar_clientes, editar_cliente, excluir_cliente
 from agencias import cadastrar_agencia, procurar_agencia, listar_agencias
-from contas import criar_conta, procurar_conta, listar_contas, listar_contas_saldo_positivo, listar_contas_clientes, listar_titulares, adicionar_titular, remover_titular, substituir_titular, excluir_conta, consultar_saldo, deposito, saque, transferencia, calculo_poupanca 
+from contas import ContaCorrente, ContaPoupanca
 
 app = Flask(__name__)
 
@@ -211,42 +211,23 @@ def pagina_contas():
 @app.route("/contas/cadastrar", methods = ["GET", "POST"])
 
 def cadastrar_conta_w():
-    mensagem = ""
 
     if request.method == "POST":
-        clientes, agencias, contas = carregar_dados()
-
-        num_agencia = request.form["num_agencia"]
-        tipo_titulares = int(request.form["tipo_titulares"])
+        clientes, contas = carregar_dados()
+        maior_num = 0
         saldo = float(request.form["saldo"])
         tipo_conta = int(request.form["tipo_conta"])
 
-        titulares_texto = request.form["titulares"]
-
-        titulares = [cpf.strip() for cpf in titulares_texto.split(",") if cpf.strip() != ""]
-
-        resultado = criar_conta(contas, clientes, agencias, num_agencia, tipo_titulares, saldo, titulares, tipo_conta)
-
-        if resultado == -1:
-            mensagem = "Agência não encontrada."
-        elif resultado == -2:
-            mensagem = "Tipo de titularidade inválido."
-        elif resultado == -3:
-            mensagem = "Saldo inicial inválido."
-        elif resultado == -4:
-            mensagem = "Quantidade de titulares inválida."
-        elif resultado == -5:
-            mensagem = "Um dos titulares não está cadastrado."
-        elif resultado == -6:
-            mensagem = "Tipo de conta inválido."
-        elif resultado == -7:
-            mensagem = "Existem titulares repetidos."
-        else:
-            contas.append(resultado)
-            salvar_dados(clientes, agencias, contas)
+        for conta in contas:
+            if conta.num_conta > maior_num:
+                maior_num += 1
+        if tipo_conta == 1:
+            contas[maior_num] = ContaCorrente(saldo, maior_num)
+        elif tipo_conta == 2:
+            contas[maior_num] = ContaPoupanca(saldo, maior_num)        
 
             return redirect(url_for("pagina_contas", mensagem = "Conta cadastrada com sucesso."))
-    return render_template("cadastrar_conta.html", mensagem = mensagem)
+    return render_template("cadastrar_conta.html", mensagem = "...")
 
 #Página para procurar conta
 @app.route("/contas/procurar", methods = ["GET", "POST"])
@@ -482,24 +463,14 @@ def deposito_w():
         clientes, agencias, contas = carregar_dados()
 
         num_conta = int(request.form["num_conta"])
-        num_agencia = request.form["num_agencia"]
-        cpf = request.form["cpf"]
         valor = float(request.form["valor"])
+        try:
+            num_conta.depositar(valor)
+        except AttributeError:
+            print("Erro: conta não encontrada.")
+        salvar_dados(clientes, agencias, contas)
 
-        resultado = deposito(contas, num_conta, num_agencia, cpf, valor)
-
-        if resultado == -1:
-            mensagem = "Conta não encontrada."
-        elif resultado == -2:
-            mensagem = "CPF não autorizado."
-        elif resultado == -4:
-            mensagem = "Conta salário não permite essa operação."
-        elif resultado == 0:
-            mensagem = "Valor inválido."
-        elif resultado == 1:
-            salvar_dados(clientes, agencias, contas)
-
-            mensagem = "Depósito realizado com sucesso."
+        mensagem = "Saque realizado com sucesso."
     return render_template("deposito.html", mensagem = mensagem)
 
 #Página para realizar saque
@@ -512,24 +483,14 @@ def saque_w():
         clientes, agencias, contas = carregar_dados()
 
         num_conta = int(request.form["num_conta"])
-        num_agencia = request.form["num_agencia"]
-        cpf = request.form["cpf"]
         valor = float(request.form["valor"])
+        try:
+            num_conta.sacar(valor)
+        except AttributeError:
+            print("Erro: conta não encontrada.")
+        salvar_dados(clientes, agencias, contas)
 
-        resultado = saque(contas, num_conta, num_agencia, cpf, valor)
-
-        if resultado == -1:
-            mensagem = "Conta não encontrada."
-        elif resultado == -2:
-            mensagem = "CPF não autorizado."
-        elif resultado == -3:
-            mensagem = "Saldo insuficiente."
-        elif resultado == 0:
-            mensagem = "Valor inválido."
-        elif resultado == 1:
-            salvar_dados(clientes, agencias, contas)
-
-            mensagem = "Saque realizado com sucesso."
+        mensagem = "Saque realizado com sucesso."
     return render_template("saque.html", mensagem = mensagem)
 
 #Página para realizar transferência
@@ -542,34 +503,16 @@ def transferencia_w():
         clientes, agencias, contas = carregar_dados()
 
         conta_origem = int(request.form["conta_origem"])
-        agencia_origem = request.form["agencia_origem"]
-        cpf = request.form["cpf"]
-
         conta_destino = int(request.form["conta_destino"])
-        agencia_destino = request.form["agencia_destino"]
-
         valor = float(request.form["valor"])
+        try:
+            conta_origem.transferir(valor, conta_destino)
+        except AttributeError:
+            print("Erro: conta(s) não encontrada(s).")
+            
+        salvar_dados(clientes, agencias, contas)
 
-        resultado = transferencia(contas, conta_origem, agencia_origem, cpf, conta_destino, agencia_destino, valor)
-
-        if resultado == -1:
-            mensagem = "Conta de origem não encontrada."
-        elif resultado == -2:
-            mensagem = "CPF não autorizado."
-        elif resultado == -3:
-            mensagem = "Conta de destino não encontrada."
-        elif resultado == -4:
-            mensagem = "As contas de origem e destino são iguais."
-        elif resultado == -5:
-            mensagem = "Saldo insuficiente."
-        elif resultado == -6:
-            mensagem = "Conta salário não permite essa operação."
-        elif resultado == 0:
-            mensagem = "Valor inválido."
-        elif resultado == 1:
-            salvar_dados(clientes, agencias, contas)
-
-            mensagem = "Transferência realizada com sucesso."
+        mensagem = "Transferência realizada com sucesso."
     return render_template("transferencia.html", mensagem = mensagem)
 
 #Página para aplicar rendimento da poupança

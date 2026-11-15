@@ -8,7 +8,10 @@ class Conta(ABC):
     #__contas = {} <------------- ISSO É DA AGÊNCIA, NÃO É PRA SALVAR AQUI! ver com gabs a chamada para salvar
 
     def __init__(self, saldo, num_conta):
-        self.__saldo = saldo
+        if saldo < 0:
+            self.__saldo = 0
+        else:    
+            self.__saldo = saldo
         self.__num_conta = num_conta #<---- aqui é melhor puxar da lista de contas existente em Agência, a fim de evitar duplicação
         #self.__cliente = Cliente.cpf, lembrar de passar no init
         #self.__contas[self.__num_conta] = {"saldo": saldo,
@@ -35,6 +38,8 @@ class Conta(ABC):
         self.validacao_valor(valor)
         self.__saldo -= valor
     def transferencia(self, valor, conta_destino):
+        if self.__num_conta == conta_destino:
+            raise ValueError("As contas de origem e destino são a mesma.")
         self.validacao_valor(valor)
         self.sacar(valor)
         conta_destino.depositar(valor)
@@ -44,8 +49,8 @@ class Conta(ABC):
 
 class ContaCorrente(Conta):
 
-    def __init__(self, saldo, num_conta, tipo_conta):
-        super().__init__(saldo, num_conta, tipo_conta)
+    def __init__(self, saldo, num_conta):
+        super().__init__(saldo, num_conta)
         self._cheque_especial = 200
     def __str__(self):
         base = super().__str__() 
@@ -63,8 +68,8 @@ class ContaCorrente(Conta):
 
 class ContaPoupanca(Conta):
 
-    def __init__(self, saldo, num_conta, tipo_conta):
-        super().__init__(saldo, num_conta, tipo_conta)
+    def __init__(self, saldo, num_conta):
+        super().__init__(saldo, num_conta)
     def __str__(self):
         base = super().__str__() 
         return f"{base}\nRendimento: {self._rendimento}"

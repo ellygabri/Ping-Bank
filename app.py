@@ -548,45 +548,15 @@ def poupanca_w():
 
     return render_template("poupanca.html", mensagem=mensagem, novo_saldo=novo_saldo)
 
-#Página principal dos relatórios
+
 @app.route("/relatorios")
 
 def pagina_relatorios():
     return render_template("relatorios.html")
 
-#Página para exibir o relatório geral do banco
 @app.route("/relatorios/banco")
 
 def relatorio_banco_w():
-    clientes, agencias, contas = carregar_dados()
+    resumo = ResumoBancario(agencia)
 
-    resumo = resumo_bancario(clientes, agencias, contas)
-
-    return render_template("relatorio_banco.html", resumo = resumo)
-
-#Página para exibir relatório de uma agência
-@app.route("/relatorios/agencia", methods = ["GET", "POST"])
-
-def relatorio_agencia_w():
-    agencia = None
-    quantidade_contas = None
-    montante = None
-    mensagem = ""
-
-    if request.method == "POST":
-        clientes, agencias, contas = carregar_dados()
-
-        num_agencia = request.form["num_agencia"]
-
-        agencia_encontrada = procurar_agencia(agencias, num_agencia)
-
-        if agencia_encontrada == False:
-            mensagem = "Agência não encontrada."
-
-        else:
-            agencia = agencia_encontrada
-
-            quantidade_contas = quantidade_contas_agencia(contas, num_agencia)
-
-            montante = montante_agencia(contas, num_agencia)
-    return render_template("relatorio_agencia.html", agencia = agencia, quantidade_contas = quantidade_contas, montante = montante, mensagem = mensagem)
+    return render_template("relatorio_banco.html", resumo=resumo)

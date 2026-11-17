@@ -2,18 +2,13 @@ from abc import ABC, abstractmethod
 
 class Conta(ABC):
 
-    #__contas = {} <------------- ISSO É DA AGÊNCIA, NÃO É PRA SALVAR AQUI! ver com gabs a chamada para salvar
 
-    def __init__(self, saldo, num_conta):
+    def __init__(self, num_conta, saldo):
         if saldo < 0:
             self.__saldo = 0
         else:    
             self.__saldo = saldo
-        self.titulares = []  # CPFs dos titulares
-        self.__num_conta = num_conta #<---- aqui é melhor puxar da lista de contas existente em Agência, a fim de evitar duplicação
-        #self.__cliente = Cliente.cpf, lembrar de passar no init
-        #self.__contas[self.__num_conta] = {"saldo": saldo,
-                                            #"tipo_conta": self.__tipo_conta}
+        self.__num_conta = num_conta 
     def __str__(self):
         return f"""
     ---- DADOS DA CONTA ----
@@ -59,14 +54,20 @@ class ContaCorrente(Conta):
         return f"{base}\nCheque especial disponível: {self._cheque_especial}"
 
     def sacar(self, valor):
-        if valor > self.__saldo:
-            excedente = valor - self.saldo 
-            self.validacao_valor((self._cheque_especial - excedente))
-            self.__saldo = 0
-            self._cheque_especial -= excedente
-        self.__saldo -= valor
+        if valor <= 0:
+            raise ValueError("Valor inválido.")
+        if valor > self.saldo + self._cheque_especial:
+            raise ValueError("Saldo insuficiente.")
+        if self.saldo - valor >= 0:
+            super().sacar(valor)
+        else:
+            self._cheque_especial -= valor - self.saldo
+            if self.saldo > 0:
+                super().sacar(self.saldo)
+
+        
     def tipo_conta(self):
-        print('Conta do tipo "Corrente."')
+        return "Corrente"
 
 class ContaPoupanca(Conta):
 

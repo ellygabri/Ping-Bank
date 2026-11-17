@@ -14,16 +14,64 @@ def inicio():
 
     return render_template("inicio.html")
 
-#Página do Dashboard
+# Página do Dashboard
 @app.route("/dashboard")
-
 def dashboard():
-    clientes, agencias, contas = carregar_dados()
 
-    resumo = resumo_bancario(clientes, agencias, contas)
+    clientes = agencia.listar_clientes()
+    contas = agencia.listar_contas()
 
-    return render_template("dashboard.html", resumo = resumo)
+    quantidade_clientes = len(clientes)
+    quantidade_contas = agencia.quantidade_contas()
+    montante_total = agencia.montante()
 
+    quantidade_corrente = 0
+    quantidade_poupanca = 0
+
+    montante_corrente = 0.0
+    montante_poupanca = 0.0
+
+    maior_saldo = 0.0
+    menor_saldo = 0.0
+    saldo_medio = 0.0
+
+    for conta in contas:
+
+        if isinstance(conta, ContaCorrente):
+            quantidade_corrente += 1
+            montante_corrente += conta.saldo
+
+        elif isinstance(conta, ContaPoupanca):
+            quantidade_poupanca += 1
+            montante_poupanca += conta.saldo
+
+    if len(contas) > 0:
+
+        maior_saldo = contas[0].saldo
+        menor_saldo = contas[0].saldo
+
+        for conta in contas:
+
+            if conta.saldo > maior_saldo:
+                maior_saldo = conta.saldo
+
+            if conta.saldo < menor_saldo:
+                menor_saldo = conta.saldo
+
+        saldo_medio = montante_total / len(contas)
+
+    return render_template("dashboard.html",
+        quantidade_clientes = quantidade_clientes,
+        quantidade_contas = quantidade_contas,
+        montante_total = montante_total,
+        maior_saldo = maior_saldo,
+        menor_saldo = menor_saldo,
+        saldo_medio = saldo_medio,
+        quantidade_corrente = quantidade_corrente,
+        quantidade_poupanca = quantidade_poupanca,
+        montante_corrente = montante_corrente,
+        montante_poupanca = montante_poupanca
+    )
 # Página para listar clientes
 @app.route("/clientes")
 def pagina_clientes():

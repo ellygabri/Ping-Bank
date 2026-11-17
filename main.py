@@ -1,3 +1,6 @@
-from app import app
+from app import app, iniciar_sistema
 
-app.run(debug = True)
+if __name__ == "__main__":
+    iniciar_sistema()
+
+    app.run(debug = True, use_reloader = False)

@@ -99,10 +99,6 @@
         R$ {{conta.saldo}}
     </p>
 
-    <p>
-        <strong>Titulares:</strong>
-        {{conta.titulares | join(", ")}}
-    </p>
 
     <p>
         <strong>Tipo da conta:</strong>
@@ -111,20 +107,9 @@
             Corrente
         {% elif conta.tipo_conta == 2 %}
             Poupança
-        {% elif conta.tipo_conta == 3 %}
-            Salário
         {% endif %}
     </p>
 
-    <p>
-        <strong>Titularidade:</strong>
-
-        {% if conta.tipo_titulares == 1 %}
-            Individual
-        {% elif conta.tipo_titulares == 2 %}
-            Conjunta
-        {% endif %}
-    </p>
 </section>
 
 {% endif %}

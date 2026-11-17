@@ -76,9 +76,7 @@
                     <th>Conta</th>
                     <th>Agência</th>
                     <th>Tipo</th>
-                    <th>Titularidade</th>
                     <th>Saldo</th>
-                    <th>Titulares</th>
                 </tr>
             </thead>
             <tbody>
@@ -101,18 +99,6 @@
                             Corrente
                         {% elif conta.tipo_conta == 2 %}
                             Poupança
-                        {% elif conta.tipo_conta == 3 %}
-                            Salário
-                        {% endif %}
-
-                    </td>
-
-                    <td>
-
-                        {% if conta.tipo_titulares == 1 %}
-                            Individual
-                        {% elif conta.tipo_titulares == 2 %}
-                            Conjunta
                         {% endif %}
 
                     </td>
@@ -121,9 +107,6 @@
                         R$ {{conta.saldo}}
                     </td>
 
-                    <td>
-                        {{conta.titulares | join(", ")}}
-                    </td>
                 </tr>
 
                 {% endfor %}

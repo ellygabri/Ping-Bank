@@ -225,18 +225,15 @@ def pagina_contas():
 def cadastrar_conta_w():
 
     if request.method == "POST":
-        clientes, contas = carregar_dados()
-        maior_num = 0
+
+        maior_num_conta = len(agencia.contas)
         saldo = float(request.form["saldo"])
         tipo_conta = int(request.form["tipo_conta"])
-
-        for conta in contas:
-            if conta.num_conta > maior_num:
-                maior_num += 1
+        
         if tipo_conta == 1:
-            contas[maior_num] = ContaCorrente(saldo, maior_num)
+            agencia.contas.append(ContaCorrente(saldo, (maior_num_conta+1)))
         elif tipo_conta == 2:
-            contas[maior_num] = ContaPoupanca(saldo, maior_num)        
+            agencia.contas.append(ContaPoupanca(saldo, (maior_num_conta+1)))        
 
             return redirect(url_for("pagina_contas", mensagem = "Conta cadastrada com sucesso."))
     return render_template("cadastrar_conta.html", mensagem = "...")
@@ -472,15 +469,13 @@ def deposito_w():
     mensagem = ""
 
     if request.method == "POST":
-        clientes, agencias, contas = carregar_dados()
 
         num_conta = int(request.form["num_conta"])
         valor = float(request.form["valor"])
         try:
             num_conta.depositar(valor)
         except AttributeError:
-            print("Erro: conta não encontrada.")
-        salvar_dados(clientes, agencias, contas)
+            return "Erro: conta não encontrada."
 
         mensagem = "Saque realizado com sucesso."
     return render_template("deposito.html", mensagem = mensagem)
@@ -492,15 +487,13 @@ def saque_w():
     mensagem = ""
 
     if request.method == "POST":
-        clientes, agencias, contas = carregar_dados()
 
         num_conta = int(request.form["num_conta"])
         valor = float(request.form["valor"])
         try:
             num_conta.sacar(valor)
         except AttributeError:
-            print("Erro: conta não encontrada.")
-        salvar_dados(clientes, agencias, contas)
+            return "Erro: conta não encontrada."
 
         mensagem = "Saque realizado com sucesso."
     return render_template("saque.html", mensagem = mensagem)
@@ -512,18 +505,15 @@ def transferencia_w():
     mensagem = ""
 
     if request.method == "POST":
-        clientes, agencias, contas = carregar_dados()
 
         conta_origem = int(request.form["conta_origem"])
         conta_destino = int(request.form["conta_destino"])
         valor = float(request.form["valor"])
         try:
-            conta_origem.transferir(valor, conta_destino)
+            conta_origem.transferencia(valor, conta_destino)
         except AttributeError:
-            print("Erro: conta(s) não encontrada(s).")
+            return "Erro: conta(s) não encontrada(s)."
             
-        salvar_dados(clientes, agencias, contas)
-
         mensagem = "Transferência realizada com sucesso."
     return render_template("transferencia.html", mensagem = mensagem)
 

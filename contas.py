@@ -1,8 +1,5 @@
 from abc import ABC, abstractmethod
 
-from clientes import buscar_cliente, normalizar_cpf
-from agencias import buscar_agencia
-
 class Conta(ABC):
 
     #__contas = {} <------------- ISSO É DA AGÊNCIA, NÃO É PRA SALVAR AQUI! ver com gabs a chamada para salvar
@@ -12,6 +9,7 @@ class Conta(ABC):
             self.__saldo = 0
         else:    
             self.__saldo = saldo
+        self.titulares = []  # CPFs dos titulares
         self.__num_conta = num_conta #<---- aqui é melhor puxar da lista de contas existente em Agência, a fim de evitar duplicação
         #self.__cliente = Cliente.cpf, lembrar de passar no init
         #self.__contas[self.__num_conta] = {"saldo": saldo,
@@ -25,7 +23,11 @@ class Conta(ABC):
     """
     @property
     def saldo(self):
-        return self.__saldo  
+        return self.__saldo
+
+    @property
+    def num_conta(self):
+        return self.__num_conta  
     def validacao_valor(self, valor, validar_saida= True):
         if valor <= 0:
             raise ValueError("Valor inválido.") 
@@ -68,16 +70,36 @@ class ContaCorrente(Conta):
 
 class ContaPoupanca(Conta):
 
-    def __init__(self, saldo, num_conta):
+    # Regra herdada da Etapa 4: poupança rende 0,5% ao mês (1000 em 2 meses = 1010)
+    TAXA_RENDIMENTO_PADRAO = 0.005
+
+    def __init__(self, saldo, num_conta, taxa_rendimento=TAXA_RENDIMENTO_PADRAO):
         super().__init__(saldo, num_conta)
+        if taxa_rendimento < 0:
+            raise ValueError("Taxa de rendimento inválida.")
+        self.taxa_rendimento = taxa_rendimento
+
     def __str__(self):
-        base = super().__str__() 
-        return f"{base}\nRendimento: {self._rendimento}"
-    #def aplicar_rendimento(self):
-        
+        return f"""
+    ---- DADOS DA CONTA ----
+    Número da conta: {self.num_conta}
+    Tipo da conta: {self.tipo_conta()}
+    Saldo disponível: {self.saldo}
+    Taxa de rendimento mensal: {self.taxa_rendimento * 100:.2f}%
+    """
+
+    def aplicar_rendimento(self, meses=1):
+        """Credita o rendimento (juros simples) de `meses` meses e devolve o valor rendido."""
+        if type(meses) != int or meses < 1:
+            raise ValueError("Quantidade de meses inválida.")
+        rendimento = round(self.saldo * self.taxa_rendimento * meses, 2)
+        # depositar() recusa valor 0; conta zerada simplesmente não rende
+        if rendimento > 0:
+            self.depositar(rendimento)
+        return rendimento
+
+    # sacar() é herdado de Conta: já recusa valor inválido e saldo insuficiente,
+    # ou seja, a poupança nunca fica negativa.
+
     def tipo_conta(self):
-        print('Conta do tipo "Poupança."')
-        
-
-
-    
+        return "Poupança"

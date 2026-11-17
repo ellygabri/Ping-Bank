@@ -194,64 +194,19 @@ def excluir_cliente_w(cpf):
 
     return redirect(url_for("pagina_clientes", mensagem=mensagem))
 
-#Página para listar agências
-@app.route("/agencias")
+#  Agência única
 
-def pagina_agencias():
-    clientes, agencias, contas = carregar_dados()
+@app.route("/agencia")
+def pagina_agencia():
+    return render_template(
+        "agencia.html",
+        agencia=agencia,
+        quantidade_clientes=len(agencia.listar_clientes()),
+        quantidade_contas=agencia.quantidade_contas(),
+        montante=agencia.montante()
+    )
 
-    lista_agencias = listar_agencias(agencias)
 
-    if lista_agencias == False:
-        lista_agencias = []
-    mensagem = request.args.get("mensagem", "")
-
-    return render_template("agencias.html", agencias = lista_agencias, mensagem = mensagem)
-
-#Página para cadastrar agência
-@app.route("/agencias/cadastrar", methods = ["GET", "POST"])
-
-def cadastrar_agencia_w():
-    mensagem = ""
-
-    if request.method == "POST":
-        clientes, agencias, contas = carregar_dados()
-
-        num_agencia = request.form["num_agencia"]
-        nome_agencia = request.form["nome_agencia"]
-
-        resultado = cadastrar_agencia(agencias, num_agencia, nome_agencia)
-
-        if resultado == -1:
-            mensagem = "Existem campos vazios."
-        elif resultado == 0:
-            mensagem = "Agência já cadastrada."
-        elif resultado == 1:
-            salvar_dados(clientes, agencias, contas)
-            return redirect(url_for("pagina_agencias", mensagem = "Agência cadastrada com sucesso."))
-    return render_template("cadastrar_agencia.html", mensagem = mensagem)
-
-#Página para procurar agência
-@app.route("/agencias/procurar", methods = ["GET", "POST"])
-
-def procurar_agencia_w():
-    agencia = None
-    mensagem = ""
-
-    if request.method == "POST":
-        clientes, agencias, contas = carregar_dados()
-
-        num_agencia = request.form["num_agencia"]
-
-        resultado = procurar_agencia(agencias, num_agencia)
-
-        if resultado == False:
-            mensagem = "Agência não encontrada."
-
-        else:
-            agencia = resultado
-
-    return render_template("procurar_agencia.html", agencia = agencia, mensagem = mensagem)
 
 #Página para listar contas
 @app.route("/contas")
@@ -566,33 +521,32 @@ def transferencia_w():
     return render_template("transferencia.html", mensagem = mensagem)
 
 #Página para aplicar rendimento da poupança
-@app.route("/operacoes/poupanca", methods = ["GET", "POST"])
-
+@app.route("/operacoes/poupanca", methods=["GET", "POST"])
 def poupanca_w():
     mensagem = ""
     novo_saldo = None
 
     if request.method == "POST":
-        clientes, agencias, contas = carregar_dados()
+        num_conta = request.form["num_conta"]
+        cpf = request.form["cpf"]
+        conta = agencia.buscar_conta(num_conta)
 
-        num_conta = int(request.form["num_conta"])
-        num_agencia = request.form["num_agencia"]
-        meses_decorridos = int(request.form["meses_decorridos"])
-
-        resultado = calculo_poupanca(num_conta, num_agencia, contas, meses_decorridos)
-
-        if resultado == -1:
+        if conta is None:
             mensagem = "Conta não encontrada."
-        elif resultado == -2:
+        elif cliente_autorizado(conta, cpf) == False:
+            mensagem = "CPF não autorizado."
+        elif isinstance(conta, ContaPoupanca) == False:
             mensagem = "A conta informada não é poupança."
-        elif resultado == -3:
-            mensagem = "Quantidade de meses inválida."
         else:
-            salvar_dados(clientes, agencias, contas)
+            try:
+                meses_decorridos = int(request.form["meses_decorridos"])
+                conta.aplicar_rendimento(meses_decorridos)
+                novo_saldo = conta.saldo
+                mensagem = "Rendimento aplicado com sucesso."
+            except ValueError as erro:
+                mensagem = str(erro)
 
-            novo_saldo = resultado
-            mensagem = "Rendimento aplicado com sucesso."
-    return render_template("poupanca.html", mensagem = mensagem, novo_saldo = novo_saldo)
+    return render_template("poupanca.html", mensagem=mensagem, novo_saldo=novo_saldo)
 
 #Página principal dos relatórios
 @app.route("/relatorios")

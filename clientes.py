@@ -18,94 +18,98 @@ class Cliente:
         self.data_nascimento = data_nascimento
         self.email = email
 
-        #Método responsável por validar o CPF do cliente
-        def validar_cpf(self):
-            cpf = self.cpf
+        #Não permite criar um cliente com CPF inválido
+        if not self.validar_cpf():
+            raise ValueError("CPF inválido.")
+        
+        #Garantindo que todos os dados obrigatórios tenham sido preenchidos
+        if (not self.nome.strip() or not self.contato.strip() or not self.endereco.strip() or not self.data_nascimento.strip() or not self.email.strip()):
+            raise ValueError("Todos os campos do cliente são obrigatórios.")
 
-            #Verificando se o CPF possui 11 digitos, como é o padrão
-            if len(cpf) != 11:
+    #Método responsável por validar o CPF do cliente
+    def validar_cpf(self):
+        cpf = self.cpf
+
+        #Verificando se o CPF possui 11 digitos, como é o padrão
+        if len(cpf) != 11:
+            return False
+
+        #Verificando se todos os caracteres são números
+        numeros = "0123456789"
+
+        for caractere in cpf:
+            if caractere not in numeros:
                 return False
 
-            #Verificando se todos os caracteres são números
-            numeros = "0123456789"
+        #Verificando se todos os números do CPF são iguais
+        todos_iguais = True
 
-            for caractere in cpf:
-                if caractere not in numeros:
-                    return False
+        for i in range(1, len(cpf)):
+            if cpf[i] != cpf[0]:
+                todos_iguais = False
 
-            #Verificando se todos os números do CPF são iguais
-            todos_iguais = True
-
-            for i in range(1, len(cpf)):
-              if cpf[i] != cpf[0]:
-                  todos_iguais = False
-
-            if todos_iguais == True:
-               return False
+        if todos_iguais == True:
+             return False
         
-            # Cálculo do primeiro dígito verificador
-            soma = 0
-            peso = 10
+        # Cálculo do primeiro dígito verificador
+        soma = 0
+        peso = 10
 
-            for i in range(9):
-               soma += int(cpf[i]) * peso
-               peso -= 1
+        for i in range(9):
+             soma += int(cpf[i]) * peso
+             peso -= 1
 
-            resto = soma % 11
+        resto = soma % 11
 
-            if resto < 2:
-              primeiro_digito = 0
+        if resto < 2:
+            primeiro_digito = 0
 
-            else:
-                primeiro_digito = 11 - resto 
+        else:
+            primeiro_digito = 11 - resto 
 
-            if primeiro_digito != int(cpf[9]):
-                return False
+        if primeiro_digito != int(cpf[9]):
+           return False
         
-            # Cálculo do segundo dígito verificador
-            soma = 0
-            peso = 11
+        # Cálculo do segundo dígito verificador
+        soma = 0
+        peso = 11
 
-            for i in range(10):
-                soma += int(cpf[i]) * peso
-                peso -= 1
+        for i in range(10):
+            soma += int(cpf[i]) * peso
+            peso -= 1
 
-            resto = soma % 11
+        resto = soma % 11
 
-            if resto < 2:
-                segundo_digito = 0
+        if resto < 2:
+            segundo_digito = 0
 
-            else:
-             segundo_digito = 11 - resto
+        else:
+            segundo_digito = 11 - resto
 
-            if segundo_digito != int(cpf[10]):
-              return False
+        if segundo_digito != int(cpf[10]):
+            return False
 
-            return True
+        return True
         
-        #Método responsável por editar os dados do cliente
-        #OBS: O CPF não pode ser alterado
-        def editar_dado(self, campo, nova_info):
+    #Método responsável por editar os dados do cliente
+    #OBS: O CPF não pode ser alterado
+    def editar_dado(self, campo, nova_info):
+        if campo not in("nome", "contato", "endereco", "data_nascimento", "email"):
+            return -2
+        if not isinstance(nova_info, str) or nova_info.strip() == "":
+            return 0
+        
+        nova_info = nova_info.strip()
 
-            if nova_info.strip() == "":
-                return 0
-            
-            if campo == "nome":
-                self.nome = nova_info
-
-            elif campo == "contato":
-                self.contato = nova_info
-
-            elif campo == "endereco":
-                self.edereco = nova_info
-
-            elif campo == "data_nascimento":
-                self.data_nascimento = nova_info
-
-            elif campo == "email":
-                self.email = nova_info
-
-            else:
-                return -2
-            
-            return 1
+        if campo == "nome":
+            self.nome = nova_info
+        elif campo == "contato":
+            self.contato = nova_info
+        elif campo == "endereco":
+            self.endereco = nova_info
+        elif campo == "data_nascimento":
+            self.data_nascimento = nova_info
+        elif campo == "email":
+            self.email = nova_info
+        
+        return 1

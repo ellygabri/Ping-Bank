@@ -35,7 +35,7 @@ class Conta(ABC):
         self.validacao_valor(valor)
         self.__saldo -= valor
     def transferencia(self, valor, conta_destino):
-        if self.__num_conta == conta_destino:
+        if self.__num_conta == conta_destino.num_conta:
             raise ValueError("As contas de origem e destino são a mesma.")
         self.validacao_valor(valor)
         self.sacar(valor)
@@ -46,8 +46,8 @@ class Conta(ABC):
 
 class ContaCorrente(Conta):
 
-    def __init__(self, saldo, num_conta):
-        super().__init__(saldo, num_conta)
+    def __init__(self, num_conta, saldo):
+        super().__init__(num_conta, saldo)
         self._cheque_especial = 200
     def __str__(self):
         base = super().__str__() 
@@ -74,8 +74,8 @@ class ContaPoupanca(Conta):
     # Regra herdada da Etapa 4: poupança rende 0,5% ao mês (1000 em 2 meses = 1010)
     TAXA_RENDIMENTO_PADRAO = 0.005
 
-    def __init__(self, saldo, num_conta, taxa_rendimento=TAXA_RENDIMENTO_PADRAO):
-        super().__init__(saldo, num_conta)
+    def __init__(self, num_conta, saldo, taxa_rendimento=TAXA_RENDIMENTO_PADRAO):
+        super().__init__(num_conta, saldo)
         if taxa_rendimento < 0:
             raise ValueError("Taxa de rendimento inválida.")
         self.taxa_rendimento = taxa_rendimento

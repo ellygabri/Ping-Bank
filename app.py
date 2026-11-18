@@ -294,20 +294,13 @@ def procurar_conta_w():
     mensagem = ""
 
     if request.method == "POST":
-        clientes, agencias, contas = carregar_dados()
 
         num_conta = int(request.form["num_conta"])
-        num_agencia = request.form["num_agencia"]
-        cpf = request.form["cpf"]
+        try:
+            conta = agencia.contas[num_conta]
+        except KeyError:
+            mensagem = "Erro: conta não encontrada."
 
-        resultado = procurar_conta( contas, num_conta, num_agencia, cpf)
-
-        if resultado == False:
-            mensagem = "Conta não encontrada."
-        elif resultado == -2:
-            mensagem = "CPF não autorizado."
-        else:
-            conta = resultado
     return render_template("procurar_conta.html", conta = conta, mensagem = mensagem)
 
 #Página para listar contas de um cliente
@@ -318,28 +311,30 @@ def contas_cliente_w():
     mensagem = ""
 
     if request.method == "POST":
-        clientes, agencias, contas = carregar_dados()
+
         cpf = request.form["cpf"]
+        try:
+            contas_cliente = agencia.listar_contas_clientes(cpf)
+            if not contas_cliente:
+                mensagem = "O cliente não possui contas."
+        except KeyError:
+                mensagem = "Erro: o cliente não possui contas."
 
-        resultado = listar_contas_clientes(contas, cpf )
-
-        if resultado == False:
-            mensagem = "O cliente não possui contas."
-        else:
-            contas_cliente = resultado
+        
     return render_template("contas_cliente.html", contas = contas_cliente, mensagem = mensagem)
 
 #Página para listar contas com saldo positivo
 @app.route("/contas/positivas")
 
 def contas_positivas_w():
-    clientes, agencias, contas = carregar_dados()
 
-    lista_contas = listar_contas_saldo_positivo(contas)
+    try:
+        contas = agencia.contas
+    except KeyError:
+            mensagem = "Erro: o cliente não possui contas."
+    contas_positivas = filter(lambda conta: conta.saldo > 0 , contas)
 
-    if lista_contas == False:
-        lista_contas = []
-    return render_template("contas_positivas.html", contas = lista_contas)
+    return render_template("contas_positivas.html", contas = contas_positivas, mensagem = mensagem)
 
 #Página para listar titulares de uma conta
 @app.route("/contas/titulares", methods = ["GET", "POST"])
@@ -461,22 +456,17 @@ def excluir_conta_w():
     mensagem = ""
 
     if request.method == "POST":
-        clientes, agencias, contas = carregar_dados()
 
         num_conta = int(request.form["num_conta"])
-        num_agencia = request.form["num_agencia"]
-        cpf = request.form["cpf"]
 
-        resultado = excluir_conta(contas, num_conta, num_agencia, cpf)
+        try:
+            for conta in agencia.contas:
+                if conta.num_conta == num_conta:
+                    agencia.contas.remove(conta)
+        except KeyError:
+            mensagem = "Erro: conta não encontrada."
 
-        if resultado == -1:
-            mensagem = "Conta não encontrada."
-        elif resultado == -2:
-            mensagem = "CPF não autorizado."
-        elif resultado == 0:
-            mensagem = "A conta precisa estar com saldo zero."
-        elif resultado == 1:
-            salvar_dados(clientes, agencias, contas)
+
             return redirect(url_for("pagina_contas", mensagem = "Conta excluída com sucesso."))
     return render_template( "excluir_conta.html", mensagem = mensagem)
 
@@ -494,20 +484,14 @@ def consultar_saldo_w():
     mensagem = ""
 
     if request.method == "POST":
-        clientes, agencias, contas = carregar_dados()
 
         num_conta = int(request.form["num_conta"])
-        num_agencia = request.form["num_agencia"]
-        cpf = request.form["cpf"]
 
-        resultado = consultar_saldo(contas, num_conta, num_agencia, cpf)
+        try:
+            num_conta.saldo
+        except KeyError:
+            mensagem = "Erro: conta não encontrada."
 
-        if resultado == -1:
-            mensagem = "Conta não encontrada."
-        elif resultado == -2:
-            mensagem = "CPF não autorizado."
-        else:
-            saldo = resultado
     return render_template("consultar_saldo.html", saldo = saldo, mensagem = mensagem)
 
 #Página para realizar depósito
@@ -521,11 +505,13 @@ def deposito_w():
         num_conta = int(request.form["num_conta"])
         valor = float(request.form["valor"])
         try:
-            num_conta.depositar(valor)
-        except AttributeError:
-            return "Erro: conta não encontrada."
+            for conta in agencia.contas:
+                if conta.num_conta == num_conta:
+                    conta.depositar(valor)
+        except KeyError:
+            mensagem = "Erro: conta não encontrada."
 
-        mensagem = "Saque realizado com sucesso."
+        mensagem = "Depósito realizado com sucesso."
     return render_template("deposito.html", mensagem = mensagem)
 
 #Página para realizar saque
@@ -539,9 +525,11 @@ def saque_w():
         num_conta = int(request.form["num_conta"])
         valor = float(request.form["valor"])
         try:
-            num_conta.sacar(valor)
-        except AttributeError:
-            return "Erro: conta não encontrada."
+            for conta in agencia.contas:
+                if conta.num_conta == num_conta:
+                    conta.sacar(valor)
+        except KeyError:
+            mensagem = "Erro: conta não encontrada."
 
         mensagem = "Saque realizado com sucesso."
     return render_template("saque.html", mensagem = mensagem)
@@ -558,9 +546,14 @@ def transferencia_w():
         conta_destino = int(request.form["conta_destino"])
         valor = float(request.form["valor"])
         try:
-            conta_origem.transferencia(valor, conta_destino)
-        except AttributeError:
-            return "Erro: conta(s) não encontrada(s)."
+            for conta in agencia.contas:
+                if conta.num_conta == conta_origem:
+                    origem_encontrada = conta
+                if conta.num_conta == conta_destino:
+                    destino_encontrado = conta
+            origem_encontrada.transferencia(valor, destino_encontrado)
+        except KeyError:
+            mensagem = "Erro: conta(s) não encontrada(s)."
             
         mensagem = "Transferência realizada com sucesso."
     return render_template("transferencia.html", mensagem = mensagem)

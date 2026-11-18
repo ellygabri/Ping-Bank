@@ -1,65 +1,34 @@
 <!DOCTYPE html>
-<html lang = "pt-br">
-    <head>
-        <meta charset = "UTF-8">
-        <meta 
-        name = "viewport" 
-        content = "width=device-width, initial-scale=1.0"
-        >
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PING BANK</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="cabecalho">
+        <div class="logo">
+            <h1>PING BANK</h1>
+        </div>
 
-        <title> PING BANK </title>
+        <nav class="menu-navegacao">
+            <a href="{{ url_for('inicio') }}">Início</a>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('pagina_clientes') }}">Clientes</a>
+            <a href="{{ url_for('pagina_agencia') }}">Agência</a>
+            <a href="{{ url_for('pagina_contas') }}">Contas</a>
+            <a href="{{ url_for('pagina_operacoes') }}">Operações</a>
+            <a href="{{ url_for('pagina_relatorios') }}">Relatórios</a>
+        </nav>
+    </header>
 
-        <link
-        rel = "stylesheet"
-        href = "{{url_for('static', filename = 'css/style.css')}}"
-        >
-    </head>
+    <main class="conteudo">
+        {% block conteudo %}{% endblock %}
+    </main>
 
-    <body>
-
-        <header class = "cabecalho">
-            <div class = "logo" >
-                <h1> PING BANK </h1>
-            </div>
-
-            <nav class = "menu-navegacao">
-
-                <a href = "{{url_for('inicio')}}">
-                    Inicio
-                </a>
-                <a href = "{{ url_for('dashboard')}}">
-                    Dashboard
-                </a>
-                <a href = "{{ url_for('pagina_clientes')}}">    
-                    Clientes
-                </a>
-                <a href = "{{url_for('pagina_agencias')}}">
-                    Agências
-                </a>
-
-                 <a href = "{{ url_for('pagina_contas')}}"> 
-                    Contas
-                </a>
-                 <a href = "{{ url_for('pagina_operacoes')}}">
-                    Operações 
-                </a>
-
-                <a href = "{{url_for('pagina_relatorios')}}">
-                    Relatórios
-                </a>
-            </nav>
-
-        </header>
-
-        <main class = "conteudo" >
-            {% block conteudo %}
-            {% endblock %}
-        </main>
-
-        <footer class = "rodape">
-            <p> PING BANK - Desenvolvido para Programação A - UFS 2026.2</p>
-        </footer> 
-
-    </body>
-
+    <footer class="rodape">
+        <p>PING BANK - Desenvolvido para Programação A - UFS 2026.2</p>
+    </footer>
+</body>
 </html>

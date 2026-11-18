@@ -1,4 +1,8 @@
 {
+    "agencia": {
+        "numero": "001",
+        "nome": "Agência PING BANK"
+    },
     "clientes": [
         {
             "nome": "João Victor",
@@ -89,6 +93,5 @@
             "email": "pedro.araujo@example.com"
         }
     ],
-    "agencias": [],
     "contas": []
 }

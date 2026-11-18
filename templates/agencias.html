@@ -1,88 +1,35 @@
 {% extends "base.html" %}
 
 {% block conteudo %}
-
-<section class = "titulo-pagina">
-
-    <h2> Agências </h2>
-
-    <p>
-        Gerenciamento das agências cadastradas no PING BANK
-    </p>
-
+<section class="titulo-pagina">
+    <h2>Agência</h2>
+    <p>Informações da agência única do PING BANK.</p>
 </section>
 
-{% if mensagem %}
-
-<div class = "mensagem">
-    {{mensagem}}
-</div>
-
-{% endif %}
-
-<div class = "acoes-pagina">
-
-    <a href = "{{url_for('cadastrar_agencia_w')}}" class = "botao">
-        Cadastrar agência
-    </a>
-
-    <a href = "{{url_for('procurar_agencia_w')}}" class = "botao botao-secundario">
-        Procurar agência
-    </a>
-
-</div>
-
-<section class = "secao-informacoes">
-
-    <h2> Agências cadastradas </h2>
-
-    {% if agencias %}
-
-    <div class = "tabela-container">
-
-        <table>
-
-            <thead>
-
-                <tr>
-                    <th>Número da agência</th>
-                    <th>Nome da agência</th>
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                {% for agencia in agencias %}
-
-                <tr>
-
-                    <td>
-                        {{agencia.num_agencia}}
-                    </td>
-
-                    <td>
-                        {{agencia.nome_agencia}}
-                    </td>
-
-                </tr>
-
-                {% endfor %}
-
-            </tbody>
-
-        </table>
-
+<section class="cards-dashboard">
+    <div class="card">
+        <h3>Número</h3>
+        <p class="valor-card">{{ agencia.numero }}</p>
     </div>
 
-    {% else %}
+    <div class="card">
+        <h3>Clientes</h3>
+        <p class="valor-card">{{ quantidade_clientes }}</p>
+    </div>
 
-    <p>
-        Nenhuma agência cadastrada.
-    </p>
+    <div class="card">
+        <h3>Contas</h3>
+        <p class="valor-card">{{ quantidade_contas }}</p>
+    </div>
 
-    {% endif %}
-
+    <div class="card">
+        <h3>Montante</h3>
+        <p class="valor-card">R$ {{ "%.2f"|format(montante) }}</p>
+    </div>
 </section>
 
+<section class="secao-informacoes">
+    <h2>{{ agencia.nome }}</h2>
+    <p>Esta é a única agência utilizada pelo sistema na Etapa 5.</p>
+</section>
 {% endblock %}
